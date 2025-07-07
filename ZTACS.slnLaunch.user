@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "ZTACS\\ZTACS\\ZTACS.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ZTACS\\ZTACS.Client\\ZTACS.Client.csproj",
+        "Action": "StartWithoutDebugging"
+      }
+    ]
+  }
+]

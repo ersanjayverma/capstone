@@ -1,5 +1,6 @@
-using Auth0.AspNetCore.Authentication;
+﻿using Auth0.AspNetCore.Authentication;
 using Microsoft.OpenApi.Models;
+using MudBlazor.Services;
 using ZTACS.Components;
 
 namespace ZTACS
@@ -28,7 +29,8 @@ namespace ZTACS
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZTACS API", Version = "v1" });
             });
-
+            // ✅ Register MudBlazor services
+            builder.Services.AddMudServices();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
