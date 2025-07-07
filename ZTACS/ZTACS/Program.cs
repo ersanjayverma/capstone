@@ -11,6 +11,7 @@ namespace ZTACS
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
             var app = builder.Build();
@@ -33,6 +34,7 @@ namespace ZTACS
             app.UseAntiforgery();
 
             app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode()
                 .AddInteractiveWebAssemblyRenderMode()
                 .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
