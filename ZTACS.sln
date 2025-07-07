@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTACS.Client", "ZTACS\ZTACS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTACS.Shared", "ZTACS\ZTACS.Shared\ZTACS.Shared.csproj", "{A5E03852-7468-4A53-B7F2-4ADDD35F7254}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTACS.Infrastructure", "ZTACS\ZTACS.Infrastructure\ZTACS.Infrastructure.csproj", "{A004E3DF-470C-4166-B4E8-BF5FCE381900}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTACS.Security", "ZTACS\ZTACS.Security\ZTACS.Security.csproj", "{2C25A662-FA86-48CD-A4DF-1EB0336A6B28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{A5E03852-7468-4A53-B7F2-4ADDD35F7254}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5E03852-7468-4A53-B7F2-4ADDD35F7254}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5E03852-7468-4A53-B7F2-4ADDD35F7254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A004E3DF-470C-4166-B4E8-BF5FCE381900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A004E3DF-470C-4166-B4E8-BF5FCE381900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A004E3DF-470C-4166-B4E8-BF5FCE381900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A004E3DF-470C-4166-B4E8-BF5FCE381900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C25A662-FA86-48CD-A4DF-1EB0336A6B28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C25A662-FA86-48CD-A4DF-1EB0336A6B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C25A662-FA86-48CD-A4DF-1EB0336A6B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C25A662-FA86-48CD-A4DF-1EB0336A6B28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
