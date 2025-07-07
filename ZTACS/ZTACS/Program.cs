@@ -1,4 +1,5 @@
-using ZTACS.Client.Pages;
+using Auth0.AspNetCore.Authentication;
+using Microsoft.OpenApi.Models;
 using ZTACS.Components;
 
 namespace ZTACS
@@ -8,11 +9,25 @@ namespace ZTACS
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var _config = builder.Configuration;
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
+
+            builder.Services.AddAuth0WebAppAuthentication(options =>
+            {
+                options.Domain = _config["Auth0:Domain"];
+                options.ClientId = _config["Auth0:ClientId"];
+            });
+
+            // Add Swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZTACS API", Version = "v1" });
+            });
 
             var app = builder.Build();
 
@@ -20,18 +35,21 @@ namespace ZTACS
             if (app.Environment.IsDevelopment())
             {
                 app.UseWebAssemblyDebugging();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-
             app.UseStaticFiles();
             app.UseAntiforgery();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode()
