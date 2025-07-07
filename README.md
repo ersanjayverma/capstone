@@ -1,12 +1,12 @@
-# AI-Powered Zero Trust Access Control System (ZTACS)
+# Zero Trust Access Control System (ZTACS)
 
-# 💡 Combines cybersecurity, DevOps, and AI to secure enterprise systems.
+# 💡 Combines cybersecurity, DevOps, and CI to secure enterprise systems.
 
 # 
 
 # 🚀 Project Summary:
 
-# Build a Zero Trust access control system that uses AI and behavioral analytics to grant or deny access to services (like internal APIs, cloud resources, or microservices). All access is treated as untrusted, even from inside the network.
+# Build a Zero Trust access control system that uses behavioral analytics to grant or deny access to services (like internal APIs, cloud resources, or microservices). All access is treated as untrusted, even from inside the network.
 
 # 
 
@@ -17,10 +17,6 @@
 # 
 
 # Real-time Behavior Monitoring: Track login locations, access times, and unusual API usage patterns.
-
-# 
-
-# Anomaly Detection: Train a small ML model (e.g., Isolation Forest or LSTM) to detect suspicious access attempts.
 
 # 
 
@@ -36,17 +32,13 @@
 
 # Area	Stack
 
-# Backend	C# (.NET), Python (for ML), or Node.js
+# Backend	C# (.NET)
 
-# Frontend	React or Angular
+# Frontend	Blazor
 
-# Authentication	OAuth2 / OpenID Connect, Azure AD or Auth0
+# Authentication	OAuth2 / JWT
 
-# ML for Anomaly Detect	Scikit-learn / TensorFlow / PyTorch
+# Data Store	MYSQL , Redis (session), ElasticSearch (logs)
 
-# Data Store	PostgreSQL, Redis (session), ElasticSearch (logs)
-
-# DevOps	Docker, Kubernetes, GitHub Actions or Azure Pipelines
-
-# Monitoring	Prometheus, Grafana, Loki
+# DevOps	Docker, Kubernetes, GitHub Actions Monitoring Prometheus, Grafana
 
