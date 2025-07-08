@@ -1,11 +1,45 @@
 ﻿@inherits LayoutComponentBase
+@using MudBlazor
 
-<div class="page">
+<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" />
+
+<MudLayout>
+    <!-- AppBar should be OUTSIDE DrawerContainer -->
+    <MudAppBar Color="Color.Primary" Elevation="4">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       @onclick="@ToggleDrawer" />
+        <MudText Typo="Typo.h6" Class="ml-2">ZTACS Blackhat Panel</MudText>
+    </MudAppBar>
+
+    <!-- DrawerContainer wraps ONLY Drawer + MainContent -->
+    <MudDrawerContainer>
+
+        <MudDrawer @bind-Open="_drawerOpen"
+                   Variant="DrawerVariant.Responsive"
+                   Elevation="1"
+                   Class="mud-theme-dark"
+                   ClipMode="DrawerClipMode.Never">
+            <MudNavMenu>
+                <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+                <MudNavLink Href="/users" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+                <MudNavLink Href="/logs" Icon="@Icons.Material.Filled.Assignment">Audit Logs</MudNavLink>
+                <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+
+        <MudMainContent Class="p-4" Style="background-color: #121212;">
             @Body
-</div>
+        </MudMainContent>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+    </MudDrawerContainer>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = false;
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    private MudThemeProvider _mudThemeProvider = new();
+    private bool _isDarkMode = true;
+}
