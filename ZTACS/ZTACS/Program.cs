@@ -103,6 +103,7 @@ namespace ZTACS
             app.MapControllers(); // ✅ Maps API routes like /api/*
 
             app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode()
                 .AddInteractiveWebAssemblyRenderMode()
                 .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
