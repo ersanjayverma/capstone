@@ -15,6 +15,6 @@
                 Navigation.NavigateTo(logoutUrl, forceLoad: true);
             });
             InvokeAsync(StateHasChanged);
-        
+        return Task.CompletedTask;
     }
 }
