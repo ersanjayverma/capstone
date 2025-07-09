@@ -28,8 +28,8 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("email");
     options.ProviderOptions.DefaultScopes.Add("offline_access");
 
-    options.ProviderOptions.PostLogoutRedirectUri = "/";
-    options.ProviderOptions.RedirectUri = "/";
+    options.ProviderOptions.PostLogoutRedirectUri = "https://capstone.blackhatbadshah.com";
+    options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com";
 });
 
 await builder.Build().RunAsync();
