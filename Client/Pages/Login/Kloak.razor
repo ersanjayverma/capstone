@@ -9,7 +9,9 @@
         var realm = "ztacs";
         var domain = "auth.blackhatbadshah.com";
         var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
-        var redirectUri = Navigation.ToAbsoluteUri("authentication/login-callback").ToString();
+
+        // Ensure trailing slash in Navigation.BaseUri
+        var redirectUri = Navigation.BaseUri.TrimEnd('/') + "/authentication/login-callback";
 
         var loginUrl = $"https://{domain}/realms/{realm}/protocol/openid-connect/auth" +
                        $"?client_id={clientId}" +
