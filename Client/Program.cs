@@ -20,7 +20,7 @@ builder.Services.AddMudServices();
 // Add OIDC Authentication  
 builder.Services.AddOidcAuthentication(options =>
 {
-    options.ProviderOptions.Authority = "https://blackhat.auth0.com";
+    options.ProviderOptions.Authority = "https://auth.blackhatbadshah.com/realms/master";
     options.ProviderOptions.ClientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
     options.ProviderOptions.ResponseType = "code";
     options.ProviderOptions.DefaultScopes.Add("openid");
