@@ -15,7 +15,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("https://capstone.blackhatbadshah.com") // or your client URL
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 // 🔐 Add Auth0 JWT Bearer Authentication

@@ -23,13 +23,14 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.Authority = "https://auth.blackhatbadshah.com/realms/ztacs";
     options.ProviderOptions.ClientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
     options.ProviderOptions.ResponseType = "code";
+    options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com/authentication/login-callback";
+
+    // Optional but recommended
+    options.ProviderOptions.PostLogoutRedirectUri = "https://capstone.blackhatbadshah.com";
     options.ProviderOptions.DefaultScopes.Add("openid");
     options.ProviderOptions.DefaultScopes.Add("profile");
     options.ProviderOptions.DefaultScopes.Add("email");
-    options.ProviderOptions.DefaultScopes.Add("offline_access");
-    options.ProviderOptions.AdditionalProviderParameters.Add("audience", "https://capstone.blackhatbadshah.com");
-    options.ProviderOptions.PostLogoutRedirectUri = "https://capstone.blackhatbadshah.com/login";
-    options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com/authentication/login-callback";
 });
+
 
 await builder.Build().RunAsync();
