@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://localhost:7017") // or your client URL
+        policy.WithOrigins("https://capstone.blackhatbadshah.com") // or your client URL
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -27,11 +27,23 @@ builder.Services.AddAuthentication(options =>
     .AddJwtBearer(options =>
     {
         var domain = builder.Configuration["Auth0:Domain"];
+        var audience = builder.Configuration["Auth0:Audience"];
+
+        if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(audience))
+        {
+            throw new InvalidOperationException("Auth0 domain or audience is not configured.");
+        }
+
         options.Authority = $"https://{domain}";
-        options.Audience = builder.Configuration["Auth0:Audience"];
-        // Optional: to handle access token received from Blazor WASM
-        options.TokenValidationParameters.NameClaimType = "name";
+        options.Audience = audience;
+
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
     });
+
 
 // 🧪 Add Swagger with JWT auth support
 builder.Services.AddSwaggerGen(c =>
