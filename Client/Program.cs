@@ -19,9 +19,8 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 // Add OIDC Authentication  
 builder.Services.AddOidcAuthentication(options =>
 {
-    builder.Configuration.Bind("Auth0", options.ProviderOptions);
     options.ProviderOptions.Authority = "https://blackhat.auth0.com";
-    options.ProviderOptions.ClientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK"; // 👈 Replace with your actual Client ID  
+    options.ProviderOptions.ClientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
     options.ProviderOptions.ResponseType = "code";
     options.ProviderOptions.DefaultScopes.Add("openid");
     options.ProviderOptions.DefaultScopes.Add("profile");
