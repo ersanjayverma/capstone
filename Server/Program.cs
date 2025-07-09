@@ -34,13 +34,12 @@ builder.Services.AddAuthentication(options =>
             throw new InvalidOperationException("Auth0 domain or audience is not configured.");
         }
 
-        options.Authority = $"https://{domain}";
+        options.Authority = $"https://{domain}/realms/ztacs";
         options.Audience = audience;
 
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
-            NameClaimType = "name",
-            RoleClaimType = "role"
+            NameClaimType = "preferred_username"
         };
         options.Events = new JwtBearerEvents
         {
