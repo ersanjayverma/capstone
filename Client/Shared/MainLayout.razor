@@ -47,5 +47,16 @@
 
 @code {
     void Login() => Navigation.NavigateTo("login/google");
-    void Logout() => Navigation.NavigateTo("logout");
+    void Logout()
+    {
+        AuthStateProvider.GetAuthenticationStateAsync().ContinueWith(task =>
+        {
+            var returnTo = Uri.EscapeDataString("https://capstone.blackhatbadshah.com/");
+            var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
+            var domain = "blackhat.auth0.com";
+            var logoutUrl = $"https://{domain}/v2/logout?client_id={clientId}&returnTo={returnTo}";
+            Navigation.NavigateTo(logoutUrl, forceLoad: true);
+        });
+        InvokeAsync(StateHasChanged);
+    }
 }
