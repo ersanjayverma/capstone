@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 <MudLayout>
@@ -36,10 +37,8 @@
     <!-- 🟩 Content -->
     <MudMainContent Class="p-4">
         <RemoteAuthenticatorView Action="logIn">
-            <Authorizing>
-                <!-- Nothing here means nothing is shown -->
-            </Authorizing>
         </RemoteAuthenticatorView>
+
         @Body
     </MudMainContent>
 
