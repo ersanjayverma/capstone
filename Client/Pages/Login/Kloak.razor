@@ -1,21 +1,20 @@
-﻿@page "/login/google"
+﻿@page "/"
 @inject NavigationManager Navigation
 
-<h3>Logging in with Google...</h3>
+<h3>Redirecting to login</h3>
 
 @code {
     protected override void OnInitialized()
     {
-        // Construct redirect URL to Auth0's Universal Login with Google
-        var domain = "blackhat.auth0.com";
+        var realm = "ztacs";
+        var domain = "auth.blackhatbadshah.com";
         var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
         var redirectUri = Navigation.ToAbsoluteUri("authentication/login-callback").ToString();
 
-        var loginUrl = $"https://{domain}/authorize" +
-                       $"?response_type=code" +
-                       $"&client_id={clientId}" +
-                       $"&connection=google-oauth2" +
+        var loginUrl = $"https://{domain}/realms/{realm}/protocol/openid-connect/auth" +
+                       $"?client_id={clientId}" +
                        $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
+                       $"&response_type=code" +
                        $"&scope=openid%20profile%20email";
 
         Navigation.NavigateTo(loginUrl, forceLoad: true);

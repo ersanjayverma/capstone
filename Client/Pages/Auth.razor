@@ -1,8 +1,10 @@
-﻿@page "/"
+﻿@page "/authentication/login-callback"
+
+
 @inject HttpClient Http
 @using System.Net.Http.Json
 @using Microsoft.AspNetCore.Components.Authorization
-
+<RemoteAuthenticatorView Action="login-callback" />
 <AuthorizeView>
     <Authorized Context="auth">
         <div>
