@@ -1,0 +1,27 @@
+@page "/login"
+@rendermode InteractiveWebAssembly
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+
+
+<h3>Login</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <p>Welcome, @context.User.Identity?.Name!</p>
+        <button class="btn btn-primary" @onclick="Logout">Logout</button>
+    </Authorized>
+    <NotAuthorized>
+        @if (OperatingSystem.IsBrowser())
+        {
+            <RemoteAuthenticatorView Action="login" />
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task Logout()
+    {
+      Navigation.NavigateToLogout("authentication/logout");
+    }
+}

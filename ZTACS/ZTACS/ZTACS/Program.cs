@@ -1,96 +1,84 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-using ZTACS.Client.Pages;
 using ZTACS.Components;
+using ZTACS.Client; // ✅ Needed for typeof(Client._Imports)
+using Microsoft.AspNetCore.ResponseCompression;
 
-namespace ZTACS
+namespace ZTACS;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
+        var config = builder.Configuration;
 
-            // Load Auth0 configuration from appsettings or environment variables
-            var domain = builder.Configuration["Auth0:Domain"];
-            var audience = builder.Configuration["Auth0:Audience"];
-
-            // ✅ Add authentication using JWT Bearer
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+        // 🔐 Auth0 JWT Authentication
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = $"https://{domain}/";
-                options.Audience = audience;
+                options.Authority = $"https://{config["Auth0:Domain"]}/";
+                options.Audience = config["Auth0:Audience"];
+                options.TokenValidationParameters.NameClaimType = "name";
             });
 
-            // ✅ Add authorization
-            builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization();
 
-            // ✅ Swagger/OpenAPI
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
+        // 🌐 Swagger (with JWT support)
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "ZTACS API", Version = "v1" });
+
+            var securityScheme = new OpenApiSecurityScheme
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "ZTACS API", Version = "v1" });
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter JWT token returned from Auth0."
+            };
 
-                var scheme = new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "JWT Authorization header using the Bearer scheme."
-                };
-
-                options.AddSecurityDefinition("Bearer", scheme);
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    { scheme, Array.Empty<string>() }
-                });
+            options.AddSecurityDefinition("Bearer", securityScheme);
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { securityScheme, Array.Empty<string>() }
             });
+        });
 
-            // ✅ Add Blazor WebAssembly components
-            builder.Services.AddRazorComponents()
-                .AddInteractiveWebAssemblyComponents();
+        // ⚙️ Blazor WebAssembly hosting (interactive mode)
+        builder.Services.AddRazorComponents()
+            .AddInteractiveWebAssemblyComponents();
 
-            var app = builder.Build();
+        var app = builder.Build();
 
-            // ✅ Enable Swagger UI in dev
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseWebAssemblyDebugging();
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ZTACS API V1");
-                });
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
-
-            // ✅ Add middleware
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseAntiforgery();
-
-            app.MapStaticAssets();
-
-            app.MapRazorComponents<App>()
-                .AddInteractiveWebAssemblyRenderMode()
-                .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
-
-            app.Run();
+        // 📦 Pipeline
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseWebAssemblyDebugging();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
+        else
+        {
+            app.UseExceptionHandler("/Error");
+            app.UseHsts();
+        }
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.MapStaticAssets();
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseAntiforgery();
+
+        app.MapRazorComponents<App>()
+            .AddInteractiveWebAssemblyRenderMode()
+            .AddAdditionalAssemblies(typeof(Components._Imports).Assembly); // ✅ from ZTACS.Client
+
+        app.Run();
     }
 }
