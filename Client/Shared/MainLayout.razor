@@ -35,7 +35,11 @@
 
     <!-- 🟩 Content -->
     <MudMainContent Class="p-4">
-        <RemoteAuthenticatorView Action="logIn" />
+        <RemoteAuthenticatorView Action="logIn">
+            <Authorizing>
+                <!-- Nothing here means nothing is shown -->
+            </Authorizing>
+        </RemoteAuthenticatorView>
         @Body
     </MudMainContent>
 
