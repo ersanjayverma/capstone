@@ -11,7 +11,7 @@
         var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
 
         // Ensure trailing slash in Navigation.BaseUri
-        var redirectUri = "https://capstone.blackhatbadshah.com/authentication/login-callback";
+        var redirectUri = Navigation.BaseUri.TrimEnd('/');
 
         var loginUrl = $"https://{domain}/realms/{realm}/protocol/openid-connect/auth" +
                        $"?client_id={clientId}" +
