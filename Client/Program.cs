@@ -23,7 +23,7 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.Authority = "https://auth.blackhatbadshah.com/realms/ztacs";
     options.ProviderOptions.ClientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
     options.ProviderOptions.ResponseType = "code";
-    options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com/authentication/login-callback";
+    options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com";
 
     // Optional but recommended
     options.ProviderOptions.PostLogoutRedirectUri = "https://capstone.blackhatbadshah.com";
