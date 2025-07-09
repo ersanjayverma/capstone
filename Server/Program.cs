@@ -83,8 +83,7 @@ else
     app.UseHsts();
 }
 app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
+
 
 
 app.UseHttpsRedirection();
@@ -93,7 +92,8 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication(); // ✅ Needed for JWT auth
+app.UseAuthorization();  // ✅ This line is MISSING and required!
 
 app.MapRazorPages();
 app.MapControllers();
