@@ -42,6 +42,14 @@ builder.Services.AddAuthentication(options =>
             NameClaimType = "name",
             RoleClaimType = "role"
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("JWT validation failed: " + context.Exception.Message);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 

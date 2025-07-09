@@ -27,7 +27,7 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("profile");
     options.ProviderOptions.DefaultScopes.Add("email");
     options.ProviderOptions.DefaultScopes.Add("offline_access");
-
+    options.ProviderOptions.AdditionalProviderParameters.Add("audience", "https://capstone.blackhatbadshah.com");
     options.ProviderOptions.PostLogoutRedirectUri = "https://capstone.blackhatbadshah.com";
     options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com";
 });
