@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using System.Net.Http;
-using Microsoft.Extensions.Http;
-using ZTACS.Client;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection; // Add this line
-
+using Microsoft.Extensions.Http;
+using MudBlazor;
+using MudBlazor.Services;
+using System.Net.Http;
+using ZTACS.Client;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 
@@ -15,7 +16,7 @@ builder.Services.AddHttpClient("ZTACS.ServerAPI", client =>
 
 // Scoped HttpClient for general use  
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("ZTACS.ServerAPI"));
-
+builder.Services.AddMudServices();
 // Add OIDC Authentication  
 builder.Services.AddOidcAuthentication(options =>
 {

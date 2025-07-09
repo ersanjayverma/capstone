@@ -1,6 +1,47 @@
 ﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+<MudLayout>
+    <!-- 🟦 AppBar -->
+    <MudAppBar Elevation="4">
+        <MudText Typo="Typo.h6">ZTACS Mail</MudText>
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized>
+                <MudText Typo="Typo.subtitle2" Class="mr-2">
+                    @context.User.Identity?.Name
+                </MudText>
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="@Logout">
+                    Logout
+                </MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Login">
+                    Login
+                </MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
 
-<RemoteAuthenticatorView Action="logIn" />
-@Body
+    <!-- 🟥 Side Drawer -->
+    <MudDrawer DrawerType="DrawerType.Side" Open="true" Elevation="4" Class="mud-width-250">
+        <MudNavMenu>
+            <MudNavLink Href="/inbox" Icon="@Icons.Material.Filled.Inbox">Inbox</MudNavLink>
+            <MudNavLink Href="/sent" Icon="@Icons.Material.Filled.Send">Sent</MudNavLink>
+            <MudNavLink Href="/drafts" Icon="@Icons.Material.Filled.Drafts">Drafts</MudNavLink>
+            <MudNavLink Href="/trash" Icon="@Icons.Material.Filled.Delete">Trash</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
 
+    <!-- 🟩 Content -->
+    <MudMainContent Class="p-4">
+        <RemoteAuthenticatorView Action="logIn" />
+        @Body
+    </MudMainContent>
+
+</MudLayout>
+
+@code {
+    void Login() => Navigation.NavigateTo("login/google");
+    void Logout() => Navigation.NavigateTo("logout");
+}
