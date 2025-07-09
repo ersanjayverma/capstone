@@ -1,0 +1,17 @@
+﻿@page "/"
+<AuthorizeView>
+    <Authorized>
+        <span>Hello, @context.User.Identity?.Name!</span>
+        <button @onclick="Logout">Logout</button>
+    </Authorized>
+    <NotAuthorized>
+        <button @onclick="Login">Login</button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Inject] NavigationManager Navigation { get; set; }
+
+    void Login() => Navigation.NavigateTo("authentication/login");
+    void Logout() => Navigation.NavigateTo("authentication/logout");
+}
