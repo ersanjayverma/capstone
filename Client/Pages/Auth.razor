@@ -12,6 +12,6 @@
 @code {
     [Inject] NavigationManager Navigation { get; set; }
 
-    void Login() => Navigation.NavigateTo("authentication/login");
+    void Login() => Navigation.NavigateTo("login/google");
     void Logout() => Navigation.NavigateTo("authentication/logout");
 }
