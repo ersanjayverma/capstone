@@ -66,3 +66,38 @@ body {
     background-color: #000000;
     color: #FFFFFF; /* optional: ensures text is visible */
 }
+.mud-main-content {
+    position: relative;
+    background-color: #121212 !important; /* Dark gray instead of pure black */
+    min-height: 100vh;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.mud-main-content::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.1; /* More visible now */
+    background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'>\
+<rect width='100' height='100' fill='none'/>\
+<g stroke='%2300ffaa' stroke-width='1'>\
+<path d='M0 0 L100 100 M100 0 L0 100'/>\
+<circle cx='50' cy='50' r='2' fill='%2300ffaa'/>\
+<rect x='20' y='20' width='3' height='3' fill='%2300ffaa'/>\
+<rect x='75' y='75' width='3' height='3' fill='%2300ffaa'/>\
+</g>\
+</svg>");
+    background-size: 150px 150px;
+    background-repeat: repeat;
+    animation: circuitScroll 60s linear infinite;
+}
+
+@keyframes circuitScroll {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 1000px; }
+}
