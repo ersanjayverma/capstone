@@ -106,7 +106,7 @@
     {
         currentPage = state.Page;
 
-        var url = $"api/ThreatDetection/logs?page={currentPage}&pageSize={10}&ip={ipFilter}&status={statusFilter}";
+        var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}$page={currentPage}&pageSize={10}";
         var response = await Http.GetFromJsonAsync<(List<LoginEvent>,int)>(url);
 
         totalItems = response.Item2; // Ideally you'd get total count separately from API
