@@ -53,7 +53,12 @@
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        var userId = user.Identity?.IsAuthenticated == true ? user.FindFirst(ClaimTypes.NameIdentifier)?.Value : "anonymous";
+        var userId = user.Identity?.IsAuthenticated == true
+            ? user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+              ?? user.FindFirst("sub")?.Value
+              ?? "anonymous"
+            : "anonymous";
+
 
         var req = new ThreatDetectionRequest
         {
