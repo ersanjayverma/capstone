@@ -26,21 +26,31 @@ namespace ZTACS.Server.Services
             var riskScore = 0;
             var reasons = new List<string>();
 
-            // 1. Static: IP blacklist
+            // Log current time
+            var nowUtc = DateTime.UtcNow;
+
+            // Rule 0: Anonymous user
+            if (string.IsNullOrWhiteSpace(request.UserId) || request.UserId == "anonymous")
+            {
+                riskScore += 25;
+                reasons.Add("Anonymous user");
+            }
+
+            // Rule 1: Static IP blacklist
             if (_blacklistedIps.Contains(request.Ip))
             {
                 riskScore += 80;
                 reasons.Add("Blacklisted IP");
             }
 
-            // 2. Endpoint targeting
-            if (request.Endpoint.Contains("/admin"))
+            // Rule 2: Sensitive endpoint
+            if (request.Endpoint.Contains("/admin", StringComparison.OrdinalIgnoreCase))
             {
                 riskScore += 20;
                 reasons.Add("Accessed admin endpoint");
             }
 
-            // 3. Odd hour access
+            // Rule 3: Unusual hours
             var hour = request.Timestamp.ToUniversalTime().Hour;
             if (hour < 6 || hour > 22)
             {
@@ -48,11 +58,11 @@ namespace ZTACS.Server.Services
                 reasons.Add("Unusual access hour");
             }
 
-            // 4. Database lookups:
+            // Rule 4: Analyze login history
             var lastLogins = _db.LoginEvents
                 .Where(e => e.UserId == request.UserId)
                 .OrderByDescending(e => e.Timestamp)
-                .Take(10)
+                .Take(20)
                 .ToList();
 
             if (!lastLogins.Any())
@@ -76,32 +86,54 @@ namespace ZTACS.Server.Services
                     reasons.Add("New device used");
                 }
 
-                // 5. Brute-force pattern (5+ logins in <5 mins)
-                var recentWindow = lastLogins
-                    .Where(e => e.Timestamp > request.Timestamp.AddMinutes(-5))
-                    .Count();
-
-                if (recentWindow > 5)
+                // Rule 5: Brute force (5+ logins in 5 mins)
+                var rapidLogins = lastLogins.Count(e => e.Timestamp > request.Timestamp.AddMinutes(-5));
+                if (rapidLogins > 5)
                 {
                     riskScore += 25;
                     reasons.Add("High-frequency login attempts");
                 }
+
+                // Rule 6: Repeat request in < 10 seconds
+                var veryRecent = lastLogins.FirstOrDefault(e =>
+                    e.Endpoint == request.Endpoint &&
+                    e.Ip == request.Ip &&
+                    e.Device == request.Device &&
+                    (request.Timestamp - e.Timestamp).TotalSeconds < 10);
+
+                if (veryRecent != null)
+                {
+                    riskScore += 20;
+                    reasons.Add("Repeated request too soon");
+                }
             }
 
-            // Log current event for future analysis
+            // Log the current event for future audits
             _db.LoginEvents.Add(new LoginEvent
             {
                 UserId = request.UserId,
                 Ip = request.Ip,
                 Device = request.Device,
                 Endpoint = request.Endpoint,
-                Timestamp = request.Timestamp,
-                
+                Timestamp = request.Timestamp
             });
+
+            _db.ThreatDetections.Add(new LoginEvent()
+            {
+                UserId = request.UserId,
+                Ip = request.Ip,
+                Device = request.Device,
+                Endpoint = request.Endpoint,
+                Timestamp = request.Timestamp,
+                Score = riskScore,
+                Status = riskScore >= 75 ? "blocked" :
+                         riskScore >= 40 ? "suspicious" : "clean",
+                Reason = string.Join("; ", reasons)
+            });
+
             _db.SaveChanges();
 
-            // Final status
-            var status = riskScore switch
+            var finalStatus = riskScore switch
             {
                 >= 75 => "blocked",
                 >= 40 => "suspicious",
@@ -111,10 +143,11 @@ namespace ZTACS.Server.Services
             return new ThreatDetectionResponse
             {
                 RiskScore = riskScore,
-                Status = status,
+                Status = finalStatus,
                 Reason = string.Join("; ", reasons)
             };
         }
+
     }
 
 }

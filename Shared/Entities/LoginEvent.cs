@@ -12,6 +12,9 @@ namespace ZTACS.Shared.Entities
         public string Ip { get; set; } = null!;
         public string Device { get; set; } = null!;
         public string Endpoint { get; set; } = null!;
+        public int? Score { get; set; }
+        public string Status { get; set; } = "clean"; // default status
+        public string Reason { get; set; } = string.Empty; // default reason
         public DateTime Timestamp { get; set; }
     }
 
