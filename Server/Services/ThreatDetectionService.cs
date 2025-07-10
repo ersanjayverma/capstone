@@ -139,14 +139,16 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<(List<LoginEvent>,int)> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+        public async Task<(List<LoginEvent>, int)> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
         {
             var query = _db.LoginEvents.AsQueryable();
-           
+
             // Extract user identity from HttpContext
             var user = httpContext.User;
             var isAdmin = user.IsInRole("Admin");
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = user.Identity?.IsAuthenticated == true
+                ? user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                : null;
 
             // Limit to own logs if not admin
             if (!isAdmin && !string.IsNullOrWhiteSpace(userId))
@@ -154,24 +156,20 @@ namespace ZTACS.Server.Services
                 query = query.Where(e => e.UserId == userId);
             }
 
-            // Apply IP filter only if provided
+            // Apply filters
             if (!string.IsNullOrWhiteSpace(ip))
-            {
                 query = query.Where(e => e.Ip.Contains(ip));
-            }
 
-            // Apply status filter only if provided
             if (!string.IsNullOrWhiteSpace(status))
-            {
                 query = query.Where(e => e.Status == status);
-            }
 
-            var total = query.Count();
-            // Handle page bounds
+            // Total count before pagination
+            var total = await query.CountAsync();
+
+            // Apply pagination
             if (page < 1) page = 1;
             if (pageSize <= 0) pageSize = 50;
 
-            // Fetch paginated result
             var logs = await query
                 .OrderByDescending(e => e.Timestamp)
                 .Skip((page - 1) * pageSize)
@@ -180,6 +178,7 @@ namespace ZTACS.Server.Services
 
             return (logs, total);
         }
+
 
     }
 
