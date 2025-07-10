@@ -55,3 +55,4 @@ nunit-*.xml
 /ZTACS/.vs
 /.vs/ZTACS
 /.vs/ProjectEvaluation
+/Server/appsettings.Development.json
