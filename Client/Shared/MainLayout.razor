@@ -5,6 +5,7 @@
 @inject IJSRuntime JS
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="@_theme" />
+<MudPopoverProvider />
 <MudLayout>
     <AuthorizeView>
         <Authorized Context="main">
