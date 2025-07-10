@@ -1,0 +1,21 @@
+@page "/bye"
+@inject NavigationManager Navigation
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center align-center min-vh-100">
+    <MudCard Class="p-6" Style="background-color:#1E1E2F; color:white; border-radius:12px;">
+        <MudCardContent>
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">👋 You've successfully logged out</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6">
+                Your session has ended. Thanks for visiting ZTACS.
+            </MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoHome" FullWidth="true">Back to Home</MudButton>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/",forceLoad:true);
+    }
+}

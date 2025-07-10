@@ -1,0 +1,21 @@
+@page "/welcome"
+@inject NavigationManager Navigation
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center align-center min-vh-100">
+    <MudCard Class="p-6" Style="background-color:#18202C; color:white; border-radius:12px;">
+        <MudCardContent>
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">🎉 Welcome to ZTACS</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6">
+                You’ve been successfully authenticated. You may now continue to your dashboard or explore features.
+            </MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToDashboard" FullWidth="true">Continue</MudButton>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private void GoToDashboard()
+    {
+        Navigation.NavigateTo("/dashboard",forceLoad:true);
+    }
+}

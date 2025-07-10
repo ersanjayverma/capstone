@@ -2,7 +2,8 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
-
+@inject IJSRuntime JS 
+<RemoteAuthenticatorView/>
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="@_theme"/>
     <MudLayout>
 
@@ -53,26 +54,6 @@
     private MudTheme _theme = new();
     private void OnLoginClicked() => Navigation.NavigateTo("login", forceLoad: true);
     private void OnLogoutClicked() => Navigation.NavigateTo("logout",forceLoad: true);
-
-    
-    protected override async Task OnInitializedAsync()
-    {
-        await UpdateUserInfoAsync();
-
-        AuthStateProvider.AuthenticationStateChanged += async (task) =>
-        {
-            await InvokeAsync(async () =>
-            {
-                await UpdateUserInfoAsync();
-                StateHasChanged(); // update UI
-            });
-        };
-    }
-     private async Task UpdateUserInfoAsync()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        await InvokeAsync(StateHasChanged);
-    }
+  
 }
 

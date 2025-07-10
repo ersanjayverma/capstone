@@ -7,7 +7,7 @@
         var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK"; // 🔁 Replace with your actual client ID
         var keycloakBaseUrl = "https://auth.blackhatbadshah.com"; // 🔁 Replace with your Keycloak base URL
         var realm = "ztacs"; // 🔁 Replace with your actual realm name
-        var returnTo = Uri.EscapeDataString("https://capstone.blackhatbadshah.com");
+        var returnTo = Uri.EscapeDataString("https://capstone.blackhatbadshah.com/bye");
 
         var logoutUrl = $"{keycloakBaseUrl}/realms/{realm}/protocol/openid-connect/logout" +
                         $"?client_id={clientId}&post_logout_redirect_uri={returnTo}";
