@@ -33,7 +33,7 @@ namespace ZTACS.Server.Controllers
             // Normalize empty strings
             ip = string.IsNullOrWhiteSpace(ip) ? null : ip;
             status = string.IsNullOrWhiteSpace(status) ? null : status;
-            var logs = await threatDetectionService.GetLogs(HttpContext, ip, status, page, pageSize);
+            var logs = await threatDetectionService.GetLogs(ip, status, page, pageSize);
             return Ok(logs);
         }
     }

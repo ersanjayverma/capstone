@@ -7,7 +7,7 @@ namespace ZTACS.Server.Services
     {
         ThreatDetectionResponse Analyze(ThreatDetectionRequest request);
 
-        Task<List<LoginEvent>> GetLogs(HttpContext httpContext, string? ip = null,
+        Task<List<LoginEvent>> GetLogs(string? ip = null,
             string? status = null, int page = 1,
             int pageSize = 50);
     }

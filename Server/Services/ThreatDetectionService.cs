@@ -139,20 +139,11 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<List<LoginEvent>> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+        public async Task<List<LoginEvent>> GetLogs(string? ip = null, string? status = null, int page = 1, int pageSize = 50)
         {
             var query = _db.LoginEvents.AsQueryable();
 
-            // Extract user identity from HttpContext
-            var user = httpContext.User;
-            var isAdmin = user.IsInRole("Admin");
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // Limit to own logs if not admin
-            if (!isAdmin && !string.IsNullOrWhiteSpace(userId))
-            {
-                query = query.Where(e => e.UserId == userId);
-            }
 
             // Apply IP filter only if provided
             if (!string.IsNullOrWhiteSpace(ip))
