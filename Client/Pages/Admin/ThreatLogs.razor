@@ -36,7 +36,9 @@
                       Hover="true"
                       Dense="true"
                       Elevation="1"
-                      Class="mt-4">
+                      Class="mt-4"
+                      @bind-CurrentPage="@currentPage"
+                      CurrentPageChanged="@(page=>OnPageChanged(page))">
 
                 <HeaderContent>
                     <MudTh>User ID</MudTh>
