@@ -1,5 +1,6 @@
 ﻿@page "/admin/threat-logs"
 @using ZTACS.Shared.Entities
+@using ZTACS.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Nav
 
@@ -107,10 +108,10 @@
         currentPage = state.Page;
 
         var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}$page={currentPage}&pageSize={10}";
-        var response = await Http.GetFromJsonAsync<(List<LoginEvent>,int)>(url);
+        var response = await Http.GetFromJsonAsync<LogsResponse>(url);
 
-        totalItems = response.Item2; // Ideally you'd get total count separately from API
-        return new TableData<LoginEvent> { Items = response.Item1, TotalItems = totalItems };
+        totalItems = response.Total; // Ideally you'd get total count separately from API
+        return new TableData<LoginEvent> { Items = response.Logs, TotalItems = totalItems };
     }
 
     private async Task PreviousPage()
