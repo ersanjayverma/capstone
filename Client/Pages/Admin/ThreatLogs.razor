@@ -27,20 +27,18 @@
                 Apply Filters
             </MudButton>
 
-            <!-- Table with Pagination -->
-            <MudTable ServerData="LoadServerData"
+            <MudTable T="LoginEvent"
+                      @ref="table"
+                      ServerData="LoadServerData"
+                      Page="@currentPage"
+                      RowsPerPage="@pageSize"
+                      OnPageChanged="OnPageChanged"
+                      Breakpoint="Breakpoint.Sm"
+                      Bordered="true"
                       Hover="true"
                       Dense="true"
-                      Class="mt-4"
-                      RowsPerPage="10"
-                      @ref="table"
-                      Bordered="true"
-                      Breakpoint="Breakpoint.Sm"
                       Elevation="1"
-                      Loading="@loading">
-                <ToolBarContent>
-                    <MudText Typo="Typo.subtitle1" Class="ml-2">Page @((table?.CurrentPage ?? 0) + 1)</MudText>
-                </ToolBarContent>
+                      Class="mt-4">
 
                 <HeaderContent>
                     <MudTh>User ID</MudTh>
@@ -61,7 +59,23 @@
                     <MudTd DataLabel="Status">@con.Status</MudTd>
                     <MudTd DataLabel="Timestamp">@con.Timestamp.ToLocalTime()</MudTd>
                 </RowTemplate>
+
+                <PagerContent>
+                    <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                                   Disabled="@(currentPage == 0)"
+                                   OnClick="PreviousPage" />
+
+                    <MudText Class="mx-2">
+                        Page @(currentPage + 1) of @totalPages
+                    </MudText>
+
+                    <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                                   Disabled="@((currentPage + 1) >= totalPages)"
+                                   OnClick="NextPage" />
+                </PagerContent>
             </MudTable>
+
+
         </MudPaper>
     </Authorized>
     <NotAuthorized>
@@ -74,7 +88,12 @@
     private string statusFilter;
     private MudTable<LoginEvent> table;
     private bool loading = false;
-
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalItems;
+    private int totalPages => (int)Math.Ceiling((double)totalItems / pageSize);
+    private bool canPrevious => currentPage > 1;
+    private bool canNext => currentPage < totalPages;
     protected override async Task OnInitializedAsync()
     {
         var uri = Nav.ToAbsoluteUri(Nav.Uri);
@@ -84,28 +103,38 @@
         statusFilter = query["status"];
     }
 
-    private async Task<TableData<LoginEvent>> LoadServerData(TableState state,CancellationToken c= new())
+    private async Task<TableData<LoginEvent>> LoadServerData(TableState state,CancellationToken c = new())
     {
-        var queryParams = new List<string>
+        currentPage = state.Page + 1;
+
+        var url = $"api/ThreatDetection/logs?page={currentPage}&pageSize={state.PageSize}&ip={ipFilter}&status={statusFilter}";
+        var response = await Http.GetFromJsonAsync<List<LoginEvent>>(url);
+
+        totalItems = response?.Count ?? 0; // Ideally you'd get total count separately from API
+        return new TableData<LoginEvent> { Items = response, TotalItems = totalItems };
+    }
+    private Task OnPageChanged(int page)
+    {
+        currentPage = page;
+        return table.ReloadServerData();
+    }
+
+    private async Task PreviousPage()
+    {
+        if (currentPage > 0)
         {
-            $"page={state.Page + 1}",
-            $"pageSize={state.PageSize}"
-        };
+            currentPage--;
+            await table.ReloadServerData();
+        }
+    }
 
-        if (!string.IsNullOrWhiteSpace(ipFilter))
-            queryParams.Add($"ip={ipFilter}");
-
-        if (!string.IsNullOrWhiteSpace(statusFilter))
-            queryParams.Add($"status={statusFilter}");
-
-        var url = $"api/ThreatDetection/logs?{string.Join("&", queryParams)}";
-
-        var logs = await Http.GetFromJsonAsync<List<LoginEvent>>(url);
-        return new TableData<LoginEvent>
+    private async Task NextPage()
+    {
+        if ((currentPage + 1) < totalPages)
         {
-            Items = logs,
-            TotalItems = logs.Count // Replace with actual count from API if available
-        };
+            currentPage++;
+            await table.ReloadServerData();
+        }
     }
 
     private async Task ApplyFilters()
@@ -120,4 +149,9 @@
         Nav.NavigateTo(newUri, forceLoad: false); // Won't reload
         await table.ReloadServerData(); // Actually update table
     }
+    public class PagedResult<T>
+{
+    public List<T> Items { get; set; }
+    public int TotalCount { get; set; }
+}
 }
