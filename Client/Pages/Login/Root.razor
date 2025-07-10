@@ -15,13 +15,9 @@
             <MudDivider Class="mb-4" />
 
             <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">
-                This portal is protected by ZTACS.<br />
-                If you believe you should have access, proceed to authentication.
+                This portal is protected by ZTACS.<br/>
             </MudText>
 
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartLogin" FullWidth="true">
-                🔐 Authenticate & Enter
-            </MudButton>
         </MudCardContent>
     </MudCard>
 
@@ -30,9 +26,3 @@
     </MudText>
 </MudContainer>
 
-@code {
-    private void StartLogin()
-    {
-        Navigation.NavigateTo("login", forceLoad: true);
-    }
-}
