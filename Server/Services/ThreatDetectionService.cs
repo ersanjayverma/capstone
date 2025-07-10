@@ -1,4 +1,5 @@
-﻿using ZTACS.Server.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ZTACS.Server.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
 
@@ -8,11 +9,16 @@ namespace ZTACS.Server.Services
     public class ThreatDetectionService : IThreatDetectionService
     {
         private readonly ThreatDbContext _db;
-        private readonly HashSet<string> _blacklistedIps = new() { "10.0.0.5", "198.51.100.23" };
+        private readonly HashSet<string> _blacklistedIps;
 
         public ThreatDetectionService(ThreatDbContext db)
         {
             _db = db;
+            // Load blacklisted IPs from DB into a HashSet for fast lookup
+            _blacklistedIps = _db.BlacklistedIps
+                .AsNoTracking()
+                .Select(b => b.Ip)
+                .ToHashSet();
         }
 
         public ThreatDetectionResponse Analyze(ThreatDetectionRequest request)
