@@ -46,7 +46,7 @@
             Timestamp = DateTime.UtcNow
         };
 
-        var response = await Http.PostAsJsonAsync("api/threat", req);
+        var response = await Http.PostAsJsonAsync("api/ThreatDetection/detect", req);
         var result = await response.Content.ReadFromJsonAsync<ThreatDetectionResponse>();
 
         Status = $"🛡️ Status: {result.Status}\n📊 Risk: {result.RiskScore}\n📝 Reasons: {result.Reason}";
