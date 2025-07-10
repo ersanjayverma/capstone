@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using ZTACS.Server.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
@@ -138,15 +139,44 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async  Task<List<LoginEvent>> GetLogs()
+        public async Task<List<LoginEvent>> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
         {
-            var logs = await _db.LoginEvents
-                .AsNoTracking()
-                .OrderByDescending(l => l.Timestamp)
-                .Take(100) // Optional limit
+            var query = _db.LoginEvents.AsQueryable();
+
+            // Extract user identity from HttpContext
+            var user = httpContext.User;
+
+            // Check if user is in Admin role
+            var isAdmin = user.IsInRole("Admin");
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            // Limit to own logs if not admin
+            if (!isAdmin && !string.IsNullOrWhiteSpace(userId))
+            {
+                query = query.Where(e => e.UserId == userId);
+            }
+
+            // Apply IP and status filters
+            if (!string.IsNullOrWhiteSpace(ip))
+            {
+                query = query.Where(e => e.Ip.Contains(ip));
+            }
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(e => e.Status == status);
+            }
+
+            // Apply pagination
+            var logs = await query
+                .OrderByDescending(e => e.Timestamp)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
             return logs ?? new List<LoginEvent>();
         }
+
     }
 
 }

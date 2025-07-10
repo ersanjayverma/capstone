@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ZTACS.Shared.Models;
 using ZTACS.Server.Services;
 using ZTACS.Shared.Entities;
+using ZTACS.Shared.Models;
 
 namespace ZTACS.Server.Controllers
 {
@@ -27,9 +28,13 @@ namespace ZTACS.Server.Controllers
             return Ok(result);
         }
         [HttpGet("logs")]
-        public async Task<IActionResult> GetLogs()
+        public async Task<IActionResult> GetLogs([FromQuery] string? ip = null,
+            [FromQuery] string? status = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 50)
         {
-           var logs =await threatDetectionService.GetLogs();
+
+            var logs = await threatDetectionService.GetLogs(HttpContext, ip, status, page, pageSize);
 
             return Ok(logs);
         }
