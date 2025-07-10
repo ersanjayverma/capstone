@@ -1,9 +1,29 @@
-﻿using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
+using ZTACS.Server.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
+//Main Services
+builder.Services.AddScoped<IThreatDetectionService, ThreatDetectionService>();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Add services
 builder.Services.AddControllersWithViews();
