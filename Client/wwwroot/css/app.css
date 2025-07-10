@@ -98,3 +98,8 @@ a, .btn-link {
     0%   { background-position: 0 0; }
     100% { background-position: 0 1000px; }
 }
+.drawer-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
