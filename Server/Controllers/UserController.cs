@@ -20,7 +20,7 @@ namespace ZTACS.Server.Controllers
 
             var userInfo = new
             {
-                Name = identity.FindFirst(ClaimTypes.Name)?.Value,
+                Name = identity.FindFirst("preferred_username")?.Value,
                 Email = identity.FindFirst(ClaimTypes.Email)?.Value,
                 Subject = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value,
                 Provider = identity.FindFirst("iss")?.Value,
