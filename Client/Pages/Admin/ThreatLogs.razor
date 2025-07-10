@@ -37,6 +37,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        logs = await Http.GetFromJsonAsync<List<LoginEvent>>("api/threat/logs");
+        logs = await Http.GetFromJsonAsync<List<LoginEvent>>("api/ThreatDetection/logs");
     }
 }
