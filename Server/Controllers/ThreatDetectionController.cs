@@ -27,9 +27,9 @@ namespace ZTACS.Server.Controllers
             return Ok(result);
         }
         [HttpGet("logs")]
-        public IActionResult GetLogs()
+        public async Task<IActionResult> GetLogs()
         {
-           var logs = threatDetectionService.GetLogs();
+           var logs =await threatDetectionService.GetLogs();
 
             return Ok(logs);
         }
