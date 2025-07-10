@@ -107,18 +107,8 @@ namespace ZTACS.Server.Services
                     reasons.Add("Repeated request too soon");
                 }
             }
-
-            // Log the current event for future audits
-            _db.LoginEvents.Add(new LoginEvent
-            {
-                UserId = request.UserId,
-                Ip = request.Ip,
-                Device = request.Device,
-                Endpoint = request.Endpoint,
-                Timestamp = request.Timestamp
-            });
-
-            _db.ThreatDetections.Add(new LoginEvent()
+            
+            _db.LoginEvents.Add(new LoginEvent()
             {
                 UserId = request.UserId,
                 Ip = request.Ip,
