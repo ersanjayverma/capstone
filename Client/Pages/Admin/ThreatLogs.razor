@@ -105,7 +105,7 @@
 
     private async Task<TableData<LoginEvent>> LoadServerData(TableState state,CancellationToken c = new())
     {
-        currentPage = state.Page + 1;
+        currentPage = state.Page;
 
         var url = $"api/ThreatDetection/logs?page={currentPage}&pageSize={10}&ip={ipFilter}&status={statusFilter}";
         var response = await Http.GetFromJsonAsync<(List<LoginEvent>,int)>(url);
