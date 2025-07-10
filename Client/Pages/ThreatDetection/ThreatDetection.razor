@@ -1,11 +1,14 @@
 ﻿@page "/threat-detection"
 @using ZTACS.Shared.Models
 @inject HttpClient Http
+<AuthorizeView>
+<Authorized Context="td">
+    <MudTextField @bind-Value="IpToCheck" Label="IP Address" />
+    <MudButton OnClick="RunAnalysis">Check</MudButton>
+        <p>@Status</p>
+</Authorized>
+</AuthorizeView>
 
-<MudTextField @bind-Value="IpToCheck" Label="IP Address" />
-<MudButton OnClick="RunAnalysis">Check</MudButton>
-
-<p>@Status</p>
 
 @code {
     private string IpToCheck;
