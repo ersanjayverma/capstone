@@ -28,7 +28,7 @@ namespace ZTACS.Server.Controllers
             return Ok(result);
         }
         [HttpGet("logs")]
-        public async Task<ActionResult<List<LoginEvent>>> GetLogs([FromQuery] string? ip = null, [FromQuery] string? status = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+        public async Task<ActionResult<(List<LoginEvent>,int)>> GetLogs([FromQuery] string? ip = null, [FromQuery] string? status = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
         {
              // Normalize empty strings
     ip = string.IsNullOrWhiteSpace(ip) ? null : ip;
