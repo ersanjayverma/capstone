@@ -110,6 +110,14 @@
 
     private async Task ApplyFilters()
     {
-        Nav.NavigateTo($"/admin/threat-logs?ip={ipFilter}&status={statusFilter}", forceLoad: true);
+        var uri = new Uri(Nav.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        query["ip"] = ipFilter;
+        query["status"] = statusFilter;
+
+        var newUri = $"{uri.GetLeftPart(UriPartial.Path)}?{query}";
+        Nav.NavigateTo(newUri, forceLoad: false); // Won't reload
+        await table.ReloadServerData(); // Actually update table
     }
 }
