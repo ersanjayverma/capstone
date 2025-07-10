@@ -15,18 +15,20 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string" Label="Filter by Status" @bind-Value="statusFilter" Variant="Variant.Filled">
-                        <MudSelectItem Value="@("")">All</MudSelectItem>
-                        <MudSelectItem Value="@("clean")">Clean</MudSelectItem>
-                        <MudSelectItem Value="@("suspicious")">Suspicious</MudSelectItem>
-                        <MudSelectItem Value="@("blocked")">Blocked</MudSelectItem>
+                        <MudSelectItem Value=@("")>All</MudSelectItem>
+                        <MudSelectItem Value=@("clean")>Clean</MudSelectItem>
+                        <MudSelectItem Value=@("suspicious")>Suspicious</MudSelectItem>
+                        <MudSelectItem Value=@("blocked")>Blocked</MudSelectItem>
                     </MudSelect>
                 </MudItem>
             </MudGrid>
 
-            <MudButton OnClick="ApplyFilters" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt">Apply Filters</MudButton>
+            <MudButton OnClick="ApplyFilters" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt">
+                Apply Filters
+            </MudButton>
 
-            <!-- Table -->
-            <MudTable Items="logs" Hover="true" Dense="true" Class="mt-4">
+            <!-- Table with Pagination -->
+            <MudTable ServerData="@LoadServerData" Hover="true" Dense="true" Class="mt-4" RowsPerPage="10">
                 <HeaderContent>
                     <MudTh>User ID</MudTh>
                     <MudTh>IP</MudTh>
@@ -54,7 +56,6 @@
 </AuthorizeView>
 
 @code {
-    private List<LoginEvent> logs = new();
     private string ipFilter;
     private string statusFilter;
 
@@ -65,36 +66,34 @@
 
         ipFilter = query["ip"];
         statusFilter = query["status"];
-
-        await LoadLogs();
     }
 
-    private async Task LoadLogs()
+    private async Task<TableData<LoginEvent>> LoadServerData(TableState state,CancellationToken c= new())
     {
-        var uri = "api/ThreatDetection/logs";
+        var queryParams = new List<string>
+        {
+            $"page={state.Page + 1}",
+            $"pageSize={state.PageSize}"
+        };
 
-        var queryParams = new List<string>();
-        if (!string.IsNullOrWhiteSpace(ipFilter)) queryParams.Add($"ip={ipFilter}");
-        if (!string.IsNullOrWhiteSpace(statusFilter)) queryParams.Add($"status={statusFilter}");
+        if (!string.IsNullOrWhiteSpace(ipFilter))
+            queryParams.Add($"ip={ipFilter}");
 
-        if (queryParams.Count > 0)
-            uri += "?" + string.Join("&", queryParams);
+        if (!string.IsNullOrWhiteSpace(statusFilter))
+            queryParams.Add($"status={statusFilter}");
 
-        logs = await Http.GetFromJsonAsync<List<LoginEvent>>(uri);
+        var url = $"api/ThreatDetection/logs?{string.Join("&", queryParams)}";
+
+        var logs = await Http.GetFromJsonAsync<List<LoginEvent>>(url);
+        return new TableData<LoginEvent>
+        {
+            Items = logs,
+            TotalItems = logs.Count // Replace with actual count from API if available
+        };
     }
 
     private async Task ApplyFilters()
     {
-        var uri = "api/ThreatDetection/logs";
-
-        var queryParams = new List<string>();
-        if (!string.IsNullOrWhiteSpace(ipFilter)) queryParams.Add($"ip={ipFilter}");
-        if (!string.IsNullOrWhiteSpace(statusFilter)) queryParams.Add($"status={statusFilter}");
-
-        if (queryParams.Count > 0)
-            uri += "?" + string.Join("&", queryParams);
-
-        logs = await Http.GetFromJsonAsync<List<LoginEvent>>(uri);
-        InvokeAsync(StateHasChanged);
+        Nav.NavigateTo($"/admin/threat-logs?ip={ipFilter}&status={statusFilter}", forceLoad: true);
     }
 }
