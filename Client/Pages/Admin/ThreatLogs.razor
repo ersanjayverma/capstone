@@ -71,19 +71,16 @@
 
     private async Task LoadLogs()
     {
-        var url = "api/ThreatDetection/logs";
+        var uri = "api/ThreatDetection/logs";
 
         var queryParams = new List<string>();
-        if (!string.IsNullOrWhiteSpace(ipFilter))
-            queryParams.Add($"ip={Uri.EscapeDataString(ipFilter)}");
+        if (!string.IsNullOrWhiteSpace(ipFilter)) queryParams.Add($"ip={ipFilter}");
+        if (!string.IsNullOrWhiteSpace(statusFilter)) queryParams.Add($"status={statusFilter}");
 
-        if (!string.IsNullOrWhiteSpace(statusFilter))
-            queryParams.Add($"status={Uri.EscapeDataString(statusFilter)}");
+        if (queryParams.Count > 0)
+            uri += "?" + string.Join("&", queryParams);
 
-        if (queryParams.Any())
-            url += "?" + string.Join("&", queryParams);
-
-        logs = await Http.GetFromJsonAsync<List<LoginEvent>>(url) ?? new();
+        logs = await Http.GetFromJsonAsync<List<LoginEvent>>(uri);
     }
 
     private async Task ApplyFilters()
