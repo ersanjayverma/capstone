@@ -1,0 +1,28 @@
+﻿@page "/threat-detection"
+@using ZTACS.Shared.Models
+@inject HttpClient Http
+
+<MudTextField @bind-Value="IpToCheck" Label="IP Address" />
+<MudButton OnClick="RunAnalysis">Check</MudButton>
+
+<p>@Status</p>
+
+@code {
+    private string IpToCheck;
+    private string Status;
+
+    private async Task RunAnalysis()
+    {
+        var req = new ThreatDetectionRequest
+        {
+            Ip = IpToCheck,
+            Endpoint = "/admin",
+            Timestamp = DateTime.UtcNow
+        };
+
+        var response = await Http.PostAsJsonAsync("api/threat", req);
+        var result = await response.Content.ReadFromJsonAsync<ThreatDetectionResponse>();
+
+        Status = $"Status: {result.Status}, Risk: {result.RiskScore}, Reasons: {result.Reason}";
+    }
+}
