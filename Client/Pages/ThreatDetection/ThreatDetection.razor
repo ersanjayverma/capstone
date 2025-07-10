@@ -2,11 +2,15 @@
 @using ZTACS.Shared.Models
 @inject HttpClient Http
 <AuthorizeView>
-<Authorized Context="td">
-    <MudTextField @bind-Value="IpToCheck" Label="IP Address" />
-    <MudButton OnClick="RunAnalysis">Check</MudButton>
+    <Authorized Context="td">
+        <MudTextField @bind-Value="IpToCheck" Label="IP Address" />
+        <MudButton OnClick="RunAnalysis">Check</MudButton>
         <p>@Status</p>
-</Authorized>
+    </Authorized>
+    <NotAuthorized>
+        <p>You do not have permission to access this page.</p>
+        <MudButton Href="/login">Login</MudButton>
+    </NotAuthorized>
 </AuthorizeView>
 
 
