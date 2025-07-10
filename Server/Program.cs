@@ -41,6 +41,8 @@ builder.Services.AddAuthentication(options =>
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             NameClaimType = "preferred_username"
+            ValidateAudience = true,
+            ValidAudience = "https://capstone.blackhatbadshah.com",
         };
         options.Events = new JwtBearerEvents
         {
