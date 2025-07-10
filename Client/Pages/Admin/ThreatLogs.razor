@@ -70,7 +70,7 @@
                     </MudText>
 
                     <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
-                                   Disabled="@((currentPage + 1) >= totalPages)"
+                                   Disabled="@((currentPage) >= totalPages)"
                                    OnClick="NextPage" />
                 </PagerContent>
             </MudTable>
@@ -110,7 +110,7 @@
         var url = $"api/ThreatDetection/logs?page={currentPage}&pageSize={state.PageSize}&ip={ipFilter}&status={statusFilter}";
         var response = await Http.GetFromJsonAsync<List<LoginEvent>>(url);
 
-        totalItems = response?.Count ?? 0; // Ideally you'd get total count separately from API
+        totalItems = response?.Count?? 0; // Ideally you'd get total count separately from API
         return new TableData<LoginEvent> { Items = response, TotalItems = totalItems };
     }
     private Task OnPageChanged(int page)
