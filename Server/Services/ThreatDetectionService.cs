@@ -95,7 +95,8 @@ namespace ZTACS.Server.Services
                 Ip = request.Ip,
                 Device = request.Device,
                 Endpoint = request.Endpoint,
-                Timestamp = request.Timestamp
+                Timestamp = request.Timestamp,
+                
             });
             _db.SaveChanges();
 
