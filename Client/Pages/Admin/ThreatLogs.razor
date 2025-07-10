@@ -1,0 +1,42 @@
+﻿@page "/admin/threat-logs"
+@using ZTACS.Shared.Entities
+@inject HttpClient Http
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <MudPaper Class="pa-4 mt-6" Style="background-color:#1e1e2f; color: #fff;">
+            <MudText Typo="Typo.h5">🧠 Threat Detection Logs</MudText>
+            <MudTable Items="logs" Hover="true" Dense="true" Class="mt-4">
+                <HeaderContent>
+                    <MudTh>User ID</MudTh>
+                    <MudTh>IP</MudTh>
+                    <MudTh>Device</MudTh>
+                    <MudTh>Endpoint</MudTh>
+                    <MudTh>Score</MudTh>
+                    <MudTh>Status</MudTh>
+                    <MudTh>Timestamp</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="User ID">@context.UserId</MudTd>
+                    <MudTd DataLabel="IP">@context.Ip</MudTd>
+                    <MudTd DataLabel="Device">@context.Device</MudTd>
+                    <MudTd DataLabel="Endpoint">@context.Endpoint</MudTd>
+                    <MudTd DataLabel="Score">@context.Score</MudTd>
+                    <MudTd DataLabel="Status">@context.Status</MudTd>
+                    <MudTd DataLabel="Timestamp">@context.Timestamp.ToLocalTime()</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Error">You are not authorized to view this page.</MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<LoginEvent> logs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        logs = await Http.GetFromJsonAsync<List<LoginEvent>>("api/threat/logs");
+    }
+}

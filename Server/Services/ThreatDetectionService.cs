@@ -138,6 +138,14 @@ namespace ZTACS.Server.Services
             };
         }
 
+        public async  Task<List<LoginEvent>> GetLogs()
+        {
+            var logs = await _db.LoginEvents
+                .OrderByDescending(l => l.Timestamp)
+                .Take(100) // Optional limit
+                .ToListAsync();
+            return logs ?? new List<LoginEvent>();
+        }
     }
 
 }
