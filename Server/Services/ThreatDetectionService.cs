@@ -145,8 +145,6 @@ namespace ZTACS.Server.Services
 
             // Extract user identity from HttpContext
             var user = httpContext.User;
-
-            // Check if user is in Admin role
             var isAdmin = user.IsInRole("Admin");
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -156,25 +154,30 @@ namespace ZTACS.Server.Services
                 query = query.Where(e => e.UserId == userId);
             }
 
-            // Apply IP and status filters
+            // Apply IP filter only if provided
             if (!string.IsNullOrWhiteSpace(ip))
             {
                 query = query.Where(e => e.Ip.Contains(ip));
             }
 
+            // Apply status filter only if provided
             if (!string.IsNullOrWhiteSpace(status))
             {
                 query = query.Where(e => e.Status == status);
             }
 
-            // Apply pagination
+            // Handle page bounds
+            if (page < 1) page = 1;
+            if (pageSize <= 0) pageSize = 50;
+
+            // Fetch paginated result
             var logs = await query
                 .OrderByDescending(e => e.Timestamp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return logs ?? new List<LoginEvent>();
+            return logs;
         }
 
     }
