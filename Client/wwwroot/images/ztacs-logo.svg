@@ -1,0 +1,10 @@
+<!-- Save this as wwwroot/images/ztacs-logo.svg -->
+<svg width="160" height="48" viewBox="0 0 320 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="96" rx="16" fill="#0D1117"/>
+  <text x="24" y="60" fill="#58A6FF" font-family="Consolas, monospace" font-size="48" font-weight="bold" letter-spacing="2">
+    ZTACS
+  </text>
+  <circle cx="290" cy="24" r="6" fill="#00FF7F"/>
+  <circle cx="290" cy="48" r="6" fill="#FFA500"/>
+  <circle cx="290" cy="72" r="6" fill="#FF3C38"/>
+</svg>

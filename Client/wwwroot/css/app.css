@@ -62,3 +62,7 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+body {
+    background-color: #000000;
+    color: #FFFFFF; /* optional: ensures text is visible */
+}

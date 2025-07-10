@@ -25,6 +25,12 @@
 <Authorized Context="main">
         <!-- 🔷 Drawer -->
         <MudDrawer Open="true" Elevation="1" Variant="DrawerVariant.Mini">
+         <!-- 🔷 ZTACS Logo at Top -->
+            <div class="d-flex justify-center mb-4">
+                <a href="/dashboard" title="ZTACS Home">
+                    <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;" />
+                </a>
+            </div>
             <MudNavMenu>
                 <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
                 <MudNavLink Href="/profile" Icon="@Icons.Material.Filled.Person">Profile</MudNavLink>
