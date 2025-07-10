@@ -1,7 +1,7 @@
 ﻿@page "/admin/threat-logs"
 @using ZTACS.Shared.Entities
 @inject HttpClient Http
-<AuthorizeView Roles="admin">
+<AuthorizeView>
     <Authorized>
         <MudPaper Class="pa-4 mt-6" Style="background-color:#1e1e2f; color: #fff;">
             <MudText Typo="Typo.h5">🧠 Threat Detection Logs</MudText>
