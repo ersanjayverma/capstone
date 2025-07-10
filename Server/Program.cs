@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using ZTACS.Server.Data;
 using ZTACS.Server.Services;
 
 
@@ -24,7 +26,11 @@ builder.Services.AddScoped<IThreatDetectionService, ThreatDetectionService>();
 
 
 
-
+builder.Services.AddDbContext<ThreatDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    ));
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
