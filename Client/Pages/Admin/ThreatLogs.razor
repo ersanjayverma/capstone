@@ -15,14 +15,14 @@
                     <MudTh>Status</MudTh>
                     <MudTh>Timestamp</MudTh>
                 </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="User ID">@context.UserId</MudTd>
-                    <MudTd DataLabel="IP">@context.Ip</MudTd>
-                    <MudTd DataLabel="Device">@context.Device</MudTd>
-                    <MudTd DataLabel="Endpoint">@context.Endpoint</MudTd>
-                    <MudTd DataLabel="Score">@context.Score</MudTd>
-                    <MudTd DataLabel="Status">@context.Status</MudTd>
-                    <MudTd DataLabel="Timestamp">@context.Timestamp.ToLocalTime()</MudTd>
+                <RowTemplate context="con">
+                    <MudTd DataLabel="User ID">@con.UserId</MudTd>
+                    <MudTd DataLabel="IP">@con.Ip</MudTd>
+                    <MudTd DataLabel="Device">@con.Device</MudTd>
+                    <MudTd DataLabel="Endpoint">@con.Endpoint</MudTd>
+                    <MudTd DataLabel="Score">@con.Score</MudTd>
+                    <MudTd DataLabel="Status">@con.Status</MudTd>
+                    <MudTd DataLabel="Timestamp">@con.Timestamp.ToLocalTime()</MudTd>
                 </RowTemplate>
             </MudTable>
         </MudPaper>
