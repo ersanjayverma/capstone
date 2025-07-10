@@ -37,8 +37,7 @@
                       Dense="true"
                       Elevation="1"
                       Class="mt-4"
-                      @bind-CurrentPage="@currentPage"
-                      CurrentPageChanged="@(page=>OnPageChanged(page))">
+                      @bind-CurrentPage="@currentPage">
 
                 <HeaderContent>
                     <MudTh>User ID</MudTh>
@@ -112,11 +111,6 @@
 
         totalItems = response.Item2; // Ideally you'd get total count separately from API
         return new TableData<LoginEvent> { Items = response.Item1, TotalItems = totalItems };
-    }
-    private Task OnPageChanged(int page)
-    {
-        currentPage = page;
-        return table.ReloadServerData();
     }
 
     private async Task PreviousPage()
