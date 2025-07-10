@@ -139,7 +139,7 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<List<LoginEvent>> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+        public async Task<List<LoginEvent>> GetLogs(HttpContext httpContext, string? ip = null, string? status = null)
         {
             var query = _db.LoginEvents.AsQueryable();
 
@@ -167,14 +167,11 @@ namespace ZTACS.Server.Services
             }
 
             // Handle page bounds
-            if (page < 1) page = 1;
-            if (pageSize <= 0) pageSize = 50;
+           
 
             // Fetch paginated result
             var logs = await query
                 .OrderByDescending(e => e.Timestamp)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
                 .ToListAsync();
 
             return logs;
