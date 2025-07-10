@@ -115,7 +115,7 @@
 
     private async Task PreviousPage()
     {
-        if (currentPage > 0)
+        if (currentPage >= 0)
         {
             currentPage--;
             await table.ReloadServerData();
@@ -124,7 +124,7 @@
 
     private async Task NextPage()
     {
-        if ((currentPage + 1) < totalPages)
+        if ((currentPage) < totalPages)
         {
             currentPage++;
             await table.ReloadServerData();
