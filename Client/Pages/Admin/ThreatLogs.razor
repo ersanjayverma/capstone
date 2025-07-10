@@ -37,10 +37,7 @@
                       Bordered="true"
                       Breakpoint="Breakpoint.Sm"
                       Elevation="1"
-                      SortLabel="Sort"
-                      Loading="@loading"
-                      LoadingContent=@("Loading...")
-                      PagerContent="true">
+                      Loading="@loading">
                 <ToolBarContent>
                     <MudText Typo="Typo.subtitle1" Class="ml-2">Page @((table?.CurrentPage ?? 0) + 1)</MudText>
                 </ToolBarContent>
