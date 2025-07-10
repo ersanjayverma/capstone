@@ -28,7 +28,23 @@
             </MudButton>
 
             <!-- Table with Pagination -->
-            <MudTable ServerData="@LoadServerData" Hover="true" Dense="true" Class="mt-4" RowsPerPage="10">
+            <MudTable ServerData="LoadServerData"
+                      Hover="true"
+                      Dense="true"
+                      Class="mt-4"
+                      RowsPerPage="10"
+                      @ref="table"
+                      Bordered="true"
+                      Breakpoint="Breakpoint.Sm"
+                      Elevation="1"
+                      SortLabel="Sort"
+                      Loading="@loading"
+                      LoadingContent=@("Loading...")
+                      PagerContent="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.subtitle1" Class="ml-2">Page @((table?.CurrentPage ?? 0) + 1)</MudText>
+                </ToolBarContent>
+
                 <HeaderContent>
                     <MudTh>User ID</MudTh>
                     <MudTh>IP</MudTh>
@@ -38,6 +54,7 @@
                     <MudTh>Status</MudTh>
                     <MudTh>Timestamp</MudTh>
                 </HeaderContent>
+
                 <RowTemplate Context="con">
                     <MudTd DataLabel="User ID">@con.UserId</MudTd>
                     <MudTd DataLabel="IP">@con.Ip</MudTd>
@@ -58,6 +75,8 @@
 @code {
     private string ipFilter;
     private string statusFilter;
+    private MudTable<LoginEvent> table;
+    private bool loading = false;
 
     protected override async Task OnInitializedAsync()
     {
