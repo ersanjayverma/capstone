@@ -139,10 +139,10 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<List<LoginEvent>> GetLogs(HttpContext httpContext, string? ip = null, string? status = null)
+        public async Task<(List<LoginEvent>,int)> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
         {
             var query = _db.LoginEvents.AsQueryable();
-
+           
             // Extract user identity from HttpContext
             var user = httpContext.User;
             var isAdmin = user.IsInRole("Admin");
@@ -166,15 +166,19 @@ namespace ZTACS.Server.Services
                 query = query.Where(e => e.Status == status);
             }
 
+            var total = query.Count();
             // Handle page bounds
-           
+            if (page < 1) page = 1;
+            if (pageSize <= 0) pageSize = 50;
 
             // Fetch paginated result
             var logs = await query
                 .OrderByDescending(e => e.Timestamp)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return logs;
+            return (logs, total);
         }
 
     }

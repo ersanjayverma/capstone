@@ -32,7 +32,7 @@
                       ServerData="LoadServerData"
                       Page="@currentPage"
                       RowsPerPage="@pageSize"
-                      OnPageChanged="OnPageChanged"
+                      OnPageChanged="@OnPageChanged"
                       Breakpoint="Breakpoint.Sm"
                       Bordered="true"
                       Hover="true"
@@ -66,7 +66,7 @@
                                    OnClick="PreviousPage" />
 
                     <MudText Class="mx-2">
-                        Page @(currentPage + 1) of @totalPages
+                        Page @(currentPage) of @totalPages
                     </MudText>
 
                     <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
@@ -107,11 +107,11 @@
     {
         currentPage = state.Page + 1;
 
-        var url = $"api/ThreatDetection/logs?page={currentPage}&pageSize={state.PageSize}&ip={ipFilter}&status={statusFilter}";
-        var response = await Http.GetFromJsonAsync<List<LoginEvent>>(url);
+        var url = $"api/ThreatDetection/logs?page={currentPage}&pageSize={10}&ip={ipFilter}&status={statusFilter}";
+        var response = await Http.GetFromJsonAsync<(List<LoginEvent>,int)>(url);
 
-        totalItems = response?.Count?? 0; // Ideally you'd get total count separately from API
-        return new TableData<LoginEvent> { Items = response, TotalItems = totalItems };
+        totalItems = response.Item2; // Ideally you'd get total count separately from API
+        return new TableData<LoginEvent> { Items = response.Item1, TotalItems = totalItems };
     }
     private Task OnPageChanged(int page)
     {

@@ -28,12 +28,12 @@ namespace ZTACS.Server.Controllers
             return Ok(result);
         }
         [HttpGet("logs")]
-        public async Task<ActionResult<List<LoginEvent>>> GetLogs([FromQuery] string? ip = null, [FromQuery] string? status = null)
+        public async Task<ActionResult<List<LoginEvent>>> GetLogs([FromQuery] string? ip = null, [FromQuery] string? status = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
         {
-            // Normalize empty strings
-            ip = string.IsNullOrWhiteSpace(ip) ? null : ip;
-            status = string.IsNullOrWhiteSpace(status) ? null : status;
-            var logs = await threatDetectionService.GetLogs(HttpContext, ip, status);
+             // Normalize empty strings
+    ip = string.IsNullOrWhiteSpace(ip) ? null : ip;
+    status = string.IsNullOrWhiteSpace(status) ? null : status;
+            var logs = await threatDetectionService.GetLogs(HttpContext, ip, status, page, pageSize);
             return Ok(logs);
         }
     }
