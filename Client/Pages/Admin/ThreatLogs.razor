@@ -95,10 +95,6 @@
             uri += "?" + string.Join("&", queryParams);
 
         logs = await Http.GetFromJsonAsync<List<LoginEvent>>(uri);
-
-
-        Nav.NavigateTo(uri, forceLoad: false);
-
-        await LoadLogs();
+        InvokeAsync(StateHasChanged);
     }
 }
