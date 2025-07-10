@@ -23,6 +23,9 @@
                     <MudNavLink Href="/threat-detection" Icon="@Icons.Material.Filled.Dangerous">Threat Detection</MudNavLink>
                     <MudNavLink Href="/profile" Icon="@Icons.Material.Filled.Person">Profile</MudNavLink>
                     <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.AdminPanelSettings">Admin</MudNavLink>
+                    <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.AdminPanelSettings">
+                        <MudNavLink Href="/admin/threat-logs" Icon="@Icons.Material.Filled.People">Threat-logs</MudNavLink>
+                    </MudNavGroup>
 
                     <MudSpacer />
                     <AuthorizeView>
@@ -30,10 +33,7 @@
                             <!-- 🔒 Logout at Bottom -->
                             <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout" Class="mt-auto">Logout</MudNavLink>
                         </Authorized>
-                        <NotAuthorized>
-                            <!-- 🔒 Login at Bottom -->
-                            <MudNavLink Href="/login" Icon="@Icons.Material.Filled.Login" Class="mt-auto">Login</MudNavLink>
-                        </NotAuthorized>
+                    
                     </AuthorizeView>
                 </MudNavMenu>
             </MudDrawer>
@@ -44,9 +44,24 @@
             </MudMainContent>
         </Authorized>
         <NotAuthorized>
+            <MudDrawer Open="true" Elevation="1" Variant="DrawerVariant.Mini" Class="drawer-content">
+            <!-- 🔷 ZTACS Logo at Top -->
+            <div class="d-flex justify-center mb-4">
+                <a href="/dashboard" title="ZTACS Home">
+                    <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;" />
+                </a>
+            </div>
+
+            <!-- Navigation Menu -->
+            <MudNavMenu>
+                <!-- 🔒 Login at Bottom -->
+                <MudNavLink Href="/login" Icon="@Icons.Material.Filled.Login" Class="mt-auto">Login</MudNavLink>
+            </MudNavMenu>
+            </MudDrawer>
             <!-- 🟩 Main Content -->
             <MudMainContent Class="p-4">
                 @Body
+
             </MudMainContent>
         </NotAuthorized>
     </AuthorizeView>
@@ -57,8 +72,5 @@
 @code {
     private bool _isDarkMode = true;
     private MudTheme _theme = new();
-    private void OnLoginClicked() => Navigation.NavigateTo("login", forceLoad: true);
-    private void OnLogoutClicked() => Navigation.NavigateTo("logout", forceLoad: true);
-
 }
 
