@@ -1,21 +1,38 @@
 ﻿@page "/threat-detection"
 @using ZTACS.Shared.Models
 @inject HttpClient Http
+
 <AuthorizeView>
-    <Authorized Context="td">
-        <MudTextField @bind-Value="IpToCheck" Label="IP Address" />
-        <MudButton OnClick="RunAnalysis">Check</MudButton>
-        <p>@Status</p>
+    <Authorized>
+        <MudPaper Class="pa-6 mx-auto mt-10" MaxWidth="500px" Style="background-color:#1e1e2f; color: #f5f5f5;">
+            <MudText Typo="Typo.h5" Class="mb-4">🔍 Threat Detection</MudText>
+
+            <MudTextField @bind-Value="IpToCheck" Label="IP Address" Color="Color.Primary" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.NetworkCheck" />
+
+            <MudTextField @bind-Value="Device" Label="Device" Color="Color.Primary" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.PhoneIphone" Class="mt-3" />
+
+            <MudButton OnClick="RunAnalysis" Variant="Variant.Filled" Color="Color.Secondary" Class="mt-4" StartIcon="@Icons.Material.Filled.Search">Analyze</MudButton>
+
+            @if (!string.IsNullOrEmpty(Status))
+            {
+                <MudAlert Severity="Severity.Info" Class="mt-4" Variant="Variant.Outlined">
+                    @Status
+                </MudAlert>
+            }
+        </MudPaper>
     </Authorized>
+
     <NotAuthorized>
-        <p>You do not have permission to access this page.</p>
-        <MudButton Href="/login">Login</MudButton>
+        <MudPaper Class="pa-6 mx-auto mt-10" MaxWidth="500px" Style="background-color:#1e1e2f; color: #f5f5f5;">
+            <MudText Typo="Typo.h6">🚫 You are not authorized</MudText>
+            <MudButton Href="/login" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4">Login</MudButton>
+        </MudPaper>
     </NotAuthorized>
 </AuthorizeView>
 
-
 @code {
     private string IpToCheck;
+    private string Device;
     private string Status;
 
     private async Task RunAnalysis()
@@ -23,6 +40,8 @@
         var req = new ThreatDetectionRequest
         {
             Ip = IpToCheck,
+            Device = Device,
+            UserId = "anonymous", // Replace with actual User ID if available
             Endpoint = "/admin",
             Timestamp = DateTime.UtcNow
         };
@@ -30,6 +49,6 @@
         var response = await Http.PostAsJsonAsync("api/threat", req);
         var result = await response.Content.ReadFromJsonAsync<ThreatDetectionResponse>();
 
-        Status = $"Status: {result.Status}, Risk: {result.RiskScore}, Reasons: {result.Reason}";
+        Status = $"🛡️ Status: {result.Status}\n📊 Risk: {result.RiskScore}\n📝 Reasons: {result.Reason}";
     }
 }
