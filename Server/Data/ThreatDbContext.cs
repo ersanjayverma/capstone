@@ -28,5 +28,8 @@ namespace ZTACS.Server.Data
         public ThreatDbContext(DbContextOptions<ThreatDbContext> options) : base(options) { }
         public DbSet<BlacklistedIp> BlacklistedIps { get; set; }
         public DbSet<LoginEvent> LoginEvents { get; set; }
+        public DbSet<LogEventDetail> LogEventDetails { get; set; }
+        public DbSet<WhitelistedIp> WhitelistedIps { get; set; } = default!;
+
     }
 }

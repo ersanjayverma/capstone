@@ -1,0 +1,106 @@
+﻿@page "/dashboard"
+@inject HttpClient Http
+@using ApexCharts
+@using ZTACS.Shared.Models  <!-- Adjust this namespace based on where you put ChartPoint.cs -->
+@using ApexColor = ApexCharts.Color
+@using MudColor = MudBlazor.Color
+<AuthorizeView>
+    <Authorized>
+        <PageTitle>ZTACS Dashboard</PageTitle>
+
+        <MudText Typo="Typo.h4" Class="mb-4">ZTACS Threat Summary</MudText>
+
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#ffffff;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#000000;">Total Logs</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#000000;">@Stats?.Total</MudText>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#ffe6e6;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#b00020;">Blocked</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#b00020;">@Stats?.Blocked</MudText>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#fff6e6;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#b36b00;">Suspicious</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#b36b00;">@Stats?.Suspicious</MudText>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#e6fff2;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#007d5e;">Clean</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#007d5e;">@Stats?.Clean</MudText>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-4" />
+
+        @if (ChartData.Any())
+        {
+            <MudText Typo="Typo.h6" Class="mt-4 mb-2">Threat Status Distribution</MudText>
+
+ 
+    <ApexChart TItem="ChartPoint"
+               Title="Threats"
+               Options="@chartOptions">
+        <ApexPointSeries TItem="ChartPoint"
+                         Items="@ChartData"
+                         XValue="@(p => p.Label)"
+                         YValue="@(p => (decimal?)p.Value)" />
+    </ApexChart>
+
+
+
+
+        }
+
+        <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="LoadStats"
+                   Variant="Variant.Filled"
+                   Class="mt-4">
+            Refresh
+        </MudButton>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudPaper Class="pa-6 mx-auto mt-10" MaxWidth="500px" Style="background-color:#1e1e2f; color: #f5f5f5;">
+            <MudText Typo="Typo.h6">🚫 You are not authorized</MudText>
+            <MudButton Href="/login" Variant="Variant.Filled" Color="MudColor.Primary" Class="mt-4">Login</MudButton>
+        </MudPaper>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private LogStatistics? Stats;
+    private List<ChartPoint> ChartData = new();
+    private ApexChartOptions<ChartPoint> chartOptions = new()
+    {
+        Chart = new Chart
+        {
+            type = ApexCharts.ChartType.Bar
+        }
+    };
+    protected override async Task OnInitializedAsync() => await LoadStats();
+
+    private async Task LoadStats()
+    {
+        Stats = await Http.GetFromJsonAsync<LogStatistics>("api/ThreatDetection/logs/stats");
+
+        if (Stats is not null)
+        {
+            ChartData = new List<ChartPoint>
+            {
+                new() { Label = "Blocked", Value = Stats.Blocked },
+                new() { Label = "Suspicious", Value = Stats.Suspicious },
+                new() { Label = "Clean", Value = Stats.Clean }
+            };
+        }
+    }
+}

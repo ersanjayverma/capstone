@@ -1,12 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using ZTACS.Server.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
-
+using System.Text;
 namespace ZTACS.Server.Services
 {
-
     public class ThreatDetectionService : IThreatDetectionService
     {
         private readonly ThreatDbContext _db;
@@ -15,7 +16,6 @@ namespace ZTACS.Server.Services
         public ThreatDetectionService(ThreatDbContext db)
         {
             _db = db;
-            // Load blacklisted IPs from DB into a HashSet for fast lookup
             _blacklistedIps = _db.BlacklistedIps
                 .AsNoTracking()
                 .Select(b => b.Ip)
@@ -26,8 +26,6 @@ namespace ZTACS.Server.Services
         {
             var riskScore = 0;
             var reasons = new List<string>();
-
-            // Log current time
             var nowUtc = DateTime.UtcNow;
 
             // Rule 0: Anonymous user
@@ -87,7 +85,6 @@ namespace ZTACS.Server.Services
                     reasons.Add("New device used");
                 }
 
-                // Rule 5: Brute force (5+ logins in 5 mins)
                 var rapidLogins = lastLogins.Count(e => e.Timestamp > request.Timestamp.AddMinutes(-5));
                 if (rapidLogins > 5)
                 {
@@ -95,7 +92,6 @@ namespace ZTACS.Server.Services
                     reasons.Add("High-frequency login attempts");
                 }
 
-                // Rule 6: Repeat request in < 10 seconds
                 var veryRecent = lastLogins.FirstOrDefault(e =>
                     e.Endpoint == request.Endpoint &&
                     e.Ip == request.Ip &&
@@ -109,7 +105,14 @@ namespace ZTACS.Server.Services
                 }
             }
 
-            _db.LoginEvents.Add(new LoginEvent()
+            var finalStatus = riskScore switch
+            {
+                >= 75 => "blocked",
+                >= 40 => "suspicious",
+                _ => "clean"
+            };
+
+            _db.LoginEvents.Add(new LoginEvent
             {
                 UserId = request.UserId,
                 Ip = request.Ip,
@@ -117,19 +120,11 @@ namespace ZTACS.Server.Services
                 Endpoint = request.Endpoint,
                 Timestamp = request.Timestamp,
                 Score = riskScore,
-                Status = riskScore >= 75 ? "blocked" :
-                         riskScore >= 40 ? "suspicious" : "clean",
+                Status = finalStatus,
                 Reason = string.Join("; ", reasons)
             });
 
             _db.SaveChanges();
-
-            var finalStatus = riskScore switch
-            {
-                >= 75 => "blocked",
-                >= 40 => "suspicious",
-                _ => "clean"
-            };
 
             return new ThreatDetectionResponse
             {
@@ -139,47 +134,191 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<(List<LoginEvent>, int)> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
-        {
-            var query = _db.LoginEvents.AsQueryable();
+       public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+{
+    var query = _db.LoginEvents.AsQueryable();
+    var user = httpContext.User;
+    var isAdmin = user.IsInRole("Admin");
 
-            // Extract user identity from HttpContext
-            var user = httpContext.User;
-            var isAdmin = user.IsInRole("Admin");
-            var userId = user.Identity?.IsAuthenticated == true
-                ? user.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                : null;
+    if (!user.Identity?.IsAuthenticated ?? true)
+        return new LogResponse();
 
-            // Limit to own logs if not admin
-            if (!isAdmin && !string.IsNullOrWhiteSpace(userId))
-            {
-                query = query.Where(e => e.UserId == userId);
-            }
+    var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // Apply filters
-            if (!string.IsNullOrWhiteSpace(ip))
-                query = query.Where(e => e.Ip.Contains(ip));
-
-            if (!string.IsNullOrWhiteSpace(status))
-                query = query.Where(e => e.Status == status);
-
-            // Total count before pagination
-            var total = await query.CountAsync();
-
-            // Apply pagination
-            if (page < 1) page = 1;
-            if (pageSize <= 0) pageSize = 50;
-
-            var logs = await query
-                .OrderByDescending(e => e.Timestamp)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return (logs, total);
-        }
-
-
+    if (!isAdmin && !string.IsNullOrEmpty(userId))
+    {
+        query = query.Where(e => e.UserId == userId);
     }
 
+    if (!string.IsNullOrWhiteSpace(ip))
+        query = query.Where(e => e.Ip.Contains(ip));
+
+    if (!string.IsNullOrWhiteSpace(status))
+        query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+
+    var total = await query.CountAsync();
+
+    if (pageSize <= 0)
+    {
+        // Return all logs (for export)
+        var allLogs = await query
+            .OrderByDescending(e => e.Timestamp)
+            .ToListAsync();
+
+        return new LogResponse
+        {
+            Total = total,
+            Logs = allLogs
+        };
+    }
+
+    // Paginated response (for UI)
+    if (page < 1) page = 1;
+
+    var logs = await query
+        .OrderByDescending(e => e.Timestamp)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return new LogResponse
+    {
+        Total = total,
+        Logs = logs
+    };
+}
+
+
+        public async Task<LogEventDetail?> GetLogDetailAsync(Guid id)
+        {
+            var log = await _db.LoginEvents.FindAsync(id);
+            if (log == null) return null;
+
+            var whois = await EnrichIpAsync(log.Ip);
+
+            return new LogEventDetail
+            {
+                Id = log.Id,
+                UserId = log.UserId,
+                IP = log.Ip,
+                Device = log.Device,
+                Endpoint = log.Endpoint,
+                Timestamp = log.Timestamp,
+                Score = log.Score,
+                Status = log.Status,
+                Reason = log.Reason,
+
+                Country = whois.Country ?? string.Empty,
+                City = whois.City ?? string.Empty,
+                ISP = whois.ISP ?? string.Empty,
+                ASN = whois.ASN ?? string.Empty,
+
+                IsWhitelisted = await _db.WhitelistedIps.AnyAsync(w => w.Ip == log.Ip),
+                IsBlocked = _blacklistedIps.Contains(log.Ip),
+                RequestHeaders = [] // Optional: capture from HttpContext later
+            };
+        }
+
+        private async Task<(string? Country, string? City, string? ISP, string? ASN)> EnrichIpAsync(string ip)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                var response = await client.GetAsync($"http://ip-api.com/json/{ip}?fields=status,country,city,isp,as,query");
+                if (!response.IsSuccessStatusCode) return default;
+
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                if (root.GetProperty("status").GetString() != "success")
+                    return default;
+
+                return (
+                    Country: root.GetProperty("country").GetString(),
+                    City: root.GetProperty("city").GetString(),
+                    ISP: root.GetProperty("isp").GetString(),
+                    ASN: root.GetProperty("as").GetString()
+                );
+            }
+            catch
+            {
+                return default;
+            }
+        }
+        public async Task<List<LoginEvent>> GetAllLogs()
+{
+    return await _db.LoginEvents
+        .OrderByDescending(e => e.Timestamp)
+        .ToListAsync();
+}
+
+public async Task<string> ExportLogsToCsv()
+{
+    var logs = await _db.LoginEvents.ToListAsync();
+    var csv = new StringBuilder();
+    csv.AppendLine("Id,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp");
+
+    foreach (var log in logs)
+    {
+        csv.AppendLine($"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
+    }
+
+    return csv.ToString();
+}
+
+public async Task BlockIp(BlockIpRequest request)
+{
+    if (!_blacklistedIps.Contains(request.IP))
+    {
+        _db.BlacklistedIps.Add(new BlacklistedIp { Ip = request.IP });
+        await _db.SaveChangesAsync();
+        _blacklistedIps.Add(request.IP);
+    }
+}
+
+public async Task AddToWhitelist(WhitelistIpRequest request)
+{
+    var exists = await _db.WhitelistedIps.AnyAsync(x => x.Ip == request.IP);
+    if (!exists)
+    {
+        _db.WhitelistedIps.Add(new WhitelistedIp { Ip = request.IP });
+        await _db.SaveChangesAsync();
+    }
+}
+
+public async Task RemoveFromWhitelist(WhitelistIpRequest request)
+{
+    var entry = await _db.WhitelistedIps.FirstOrDefaultAsync(x => x.Ip == request.IP);
+    if (entry != null)
+    {
+        _db.WhitelistedIps.Remove(entry);
+        await _db.SaveChangesAsync();
+    }
+}
+
+public async Task<List<string>> GetWhitelistedIps()
+{
+    return await _db.WhitelistedIps
+        .Select(w => w.Ip)
+        .ToListAsync();
+}
+
+public async Task<LogStatistics> GetLogStatisticsAsync()
+{
+    var total = await _db.LoginEvents.CountAsync();
+    var blocked = await _db.LoginEvents.CountAsync(e => e.Status == "blocked");
+    var suspicious = await _db.LoginEvents.CountAsync(e => e.Status == "suspicious");
+    var clean = total - blocked - suspicious;
+
+    return new LogStatistics
+    {
+        Total = total,
+        Blocked = blocked,
+        Suspicious = suspicious,
+        Clean = clean
+    };
+}
+
+    }
 }
