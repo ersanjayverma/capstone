@@ -134,45 +134,60 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+       public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+{
+    var query = _db.LoginEvents.AsQueryable();
+    var user = httpContext.User;
+    var isAdmin = user.IsInRole("Admin");
+
+    if (!user.Identity?.IsAuthenticated ?? true)
+        return new LogResponse();
+
+    var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (!isAdmin && !string.IsNullOrEmpty(userId))
+    {
+        query = query.Where(e => e.UserId == userId);
+    }
+
+    if (!string.IsNullOrWhiteSpace(ip))
+        query = query.Where(e => e.Ip.Contains(ip));
+
+    if (!string.IsNullOrWhiteSpace(status))
+        query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+
+    var total = await query.CountAsync();
+
+    if (pageSize <= 0)
+    {
+        // Return all logs (for export)
+        var allLogs = await query
+            .OrderByDescending(e => e.Timestamp)
+            .ToListAsync();
+
+        return new LogResponse
         {
-            var query = _db.LoginEvents.AsQueryable();
-            var user = httpContext.User;
-            var isAdmin = user.IsInRole("Admin");
+            Total = total,
+            Logs = allLogs
+        };
+    }
 
-            if (!user.Identity?.IsAuthenticated ?? true)
-                return new LogResponse();
+    // Paginated response (for UI)
+    if (page < 1) page = 1;
 
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var logs = await query
+        .OrderByDescending(e => e.Timestamp)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
 
-            if (!isAdmin && !string.IsNullOrEmpty(userId))
-            {
-                query = query.Where(e => e.UserId == userId);
-            }
+    return new LogResponse
+    {
+        Total = total,
+        Logs = logs
+    };
+}
 
-            if (!string.IsNullOrWhiteSpace(ip))
-                query = query.Where(e => e.Ip.Contains(ip));
-
-            if (!string.IsNullOrWhiteSpace(status))
-                query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
-
-            var total = await query.CountAsync();
-
-            if (page < 1) page = 1;
-            if (pageSize <= 0) pageSize = 50;
-
-            var logs = await query
-                .OrderByDescending(e => e.Timestamp)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new LogResponse
-            {
-                Total = total,
-                Logs = logs
-            };
-        }
 
         public async Task<LogEventDetail?> GetLogDetailAsync(Guid id)
         {

@@ -22,23 +22,6 @@ namespace ZTACS.Server.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("WhitelistedIp", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Ip")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WhitelistedIps");
-                });
-
             modelBuilder.Entity("ZTACS.Shared.Entities.BlacklistedIp", b =>
                 {
                     b.Property<Guid>("Id")
@@ -200,6 +183,33 @@ namespace ZTACS.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LoginEvents");
+                });
+
+            modelBuilder.Entity("ZTACS.Shared.Entities.WhitelistedIp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WhitelistedIps");
                 });
 #pragma warning restore 612, 618
         }
