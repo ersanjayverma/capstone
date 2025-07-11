@@ -34,6 +34,7 @@ namespace ZTACS.Server.Controllers
     ip = string.IsNullOrWhiteSpace(ip) ? null : ip;
     status = string.IsNullOrWhiteSpace(status) ? null : status;
             var logs = await threatDetectionService.GetLogs(HttpContext, ip, status, page, pageSize);
+            
             return Ok(logs);
         }
     }

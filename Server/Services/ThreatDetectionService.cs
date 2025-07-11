@@ -139,47 +139,51 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<(List<LoginEvent>, int)> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
-        {
-            var query = _db.LoginEvents.AsQueryable();
+       public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+{
+   
+    var query = _db.LoginEvents.AsQueryable();
 
-            // Extract user identity from HttpContext
-            var user = httpContext.User;
-            var isAdmin = user.IsInRole("Admin");
-            var userId = user.Identity?.IsAuthenticated == true
-                ? user.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                : null;
+    var user = httpContext.User;
+    var isAdmin = user.IsInRole("Admin");
 
-            // Limit to own logs if not admin
-            if (!isAdmin && !string.IsNullOrWhiteSpace(userId))
-            {
-                query = query.Where(e => e.UserId == userId);
-            }
+    // Ensure user is authenticated
+    if (!user.Identity?.IsAuthenticated ?? true)
+        return new LogResponse();
 
-            // Apply filters
-            if (!string.IsNullOrWhiteSpace(ip))
-                query = query.Where(e => e.Ip.Contains(ip));
+    var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (!string.IsNullOrWhiteSpace(status))
-                query = query.Where(e => e.Status == status);
-
-            // Total count before pagination
-            var total = await query.CountAsync();
-
-            // Apply pagination
-            if (page < 1) page = 1;
-            if (pageSize <= 0) pageSize = 50;
-
-            var logs = await query
-                .OrderByDescending(e => e.Timestamp)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return (logs, total);
-        }
-
-
+    // If not admin, restrict logs to current user's own logs
+    if (!isAdmin && !string.IsNullOrEmpty(userId))
+    {
+        query = query.Where(e => e.UserId == userId);
     }
 
+    // Apply optional filters
+    if (!string.IsNullOrWhiteSpace(ip))
+        query = query.Where(e => e.Ip.Contains(ip));
+
+    if (!string.IsNullOrWhiteSpace(status))
+        query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+
+    // Total count for pagination
+    var total = await query.CountAsync();
+
+    // Pagination logic
+    if (page < 1) page = 1;
+    if (pageSize <= 0) pageSize = 50;
+
+    var logs = await query
+        .OrderByDescending(e => e.Timestamp)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+
+    return new LogResponse(){
+        Total = total,
+        Logs= logs
+    };
+}
+    }
 }

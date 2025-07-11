@@ -1,5 +1,4 @@
 ﻿@page "/admin/threat-logs"
-@using ZTACS.Shared.Entities
 @inject HttpClient Http
 @inject NavigationManager Nav
 
@@ -58,11 +57,11 @@
                     <MudTd DataLabel="Status">@con.Status</MudTd>
                     <MudTd DataLabel="Timestamp">@con.Timestamp.ToLocalTime()</MudTd>
                 </RowTemplate>
-
-                <PagerContent>
+<PagerContent>
+              <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="Justify.FlexStart" Spacing="1">
                     <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
                                    Disabled="@(currentPage == 0)"
-                                   OnClick="PreviousPage" />
+                                   OnClick="@PreviousPage" />
 
                     <MudText Class="mx-2">
                         Page @(currentPage) of @totalPages
@@ -70,7 +69,8 @@
 
                     <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
                                    Disabled="@((currentPage) >= totalPages)"
-                                   OnClick="NextPage" />
+                                   OnClick="@NextPage" />
+                </MudStack>
                 </PagerContent>
             </MudTable>
 
@@ -104,13 +104,13 @@
 
     private async Task<TableData<LoginEvent>> LoadServerData(TableState state,CancellationToken c = new())
     {
-        currentPage = state.Page;
+       
 
-        var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}$page={currentPage}&pageSize={10}";
-        var response = await Http.GetFromJsonAsync<(List<LoginEvent>,int)>(url);
+        var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}&page={currentPage}&pageSize={10}";
+        var response = await Http.GetFromJsonAsync<LogResponse>(url);
 
-        totalItems = response.Item2; // Ideally you'd get total count separately from API
-        return new TableData<LoginEvent> { Items = response.Item1, TotalItems = totalItems };
+        totalItems = response.Total; // Ideally you'd get total count separately from API
+        return new TableData<LoginEvent> { Items = response.Logs, TotalItems = totalItems };
     }
 
     private async Task PreviousPage()
