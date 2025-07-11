@@ -1,7 +1,7 @@
 ﻿@page "/dashboard"
 @inject HttpClient Http
 @using ApexCharts
-@using ZTACS.Shared.Models  <!-- Adjust this namespace based on where you put ChartPoint.cs -->
+@using ZTACS.Shared.Models<!-- Adjust this namespace based on where you put ChartPoint.cs -->
 @using ApexColor = ApexCharts.Color
 @using MudColor = MudBlazor.Color
 <AuthorizeView>
@@ -43,23 +43,25 @@
         <MudDivider Class="my-4" />
 
         @if (ChartData.Any())
-        {
-            <MudText Typo="Typo.h6" Class="mt-4 mb-2">Threat Status Distribution</MudText>
+                {
+        <MudText Typo="Typo.h6" Class="mt-4 mb-2">Threat Status Distribution</MudText>
+        <div style="width: 100%; height: 30%; overflow: hidden;">
+            <ApexChart TItem="ChartPoint"
+                       Title="Threats">
 
- 
-    <ApexChart TItem="ChartPoint"
-               Title="Threats"
-               Options="@chartOptions">
-        <ApexPointSeries TItem="ChartPoint"
-                         Items="@ChartData"
-                         XValue="@(p => p.Label)"
-                         YValue="@(p => (decimal?)p.Value)" />
-    </ApexChart>
+                <ApexPointSeries TItem="ChartPoint"
+                                 Items="ChartData"
+                                 Name="Threat Level"
+                                 XValue="@(p => p.Label)"
+                                 YAggregate="@(points => points.Sum(p => p.Value))"
+                                 OrderByDescending="p => p.Y"
+                                 SeriesType="SeriesType.Bar"
+                                 Color="#E51C15" />
+            </ApexChart>
+        </div>
 
 
-
-
-        }
+                }
 
         <MudButton StartIcon="@Icons.Material.Filled.Refresh"
                    OnClick="LoadStats"
@@ -80,13 +82,7 @@
 @code {
     private LogStatistics? Stats;
     private List<ChartPoint> ChartData = new();
-    private ApexChartOptions<ChartPoint> chartOptions = new()
-    {
-        Chart = new Chart
-        {
-            type = ApexCharts.ChartType.Bar
-        }
-    };
+
     protected override async Task OnInitializedAsync() => await LoadStats();
 
     private async Task LoadStats()
