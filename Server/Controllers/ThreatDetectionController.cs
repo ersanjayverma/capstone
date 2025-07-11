@@ -33,11 +33,7 @@ namespace ZTACS.Server.Controllers
         public async Task<IActionResult> GetLogs([FromQuery] string? ip = null, [FromQuery] string? status = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
         {
             var logs = await threatDetectionService.GetLogs(HttpContext, ip, status, page, pageSize);
-            return Ok(new  LogsResponse()
-        {
-            Logs = logs.Item1,
-            Total = logs.Item2
-            });
+            return Ok(logs);
         }
 
         [HttpGet("logs/{id}")]

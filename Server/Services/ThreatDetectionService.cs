@@ -134,59 +134,59 @@ namespace ZTACS.Server.Services
             };
         }
 
-       public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
-{
-    var query = _db.LoginEvents.AsQueryable();
-    var user = httpContext.User;
-    var isAdmin = user.IsInRole("Admin");
-
-    if (!user.Identity?.IsAuthenticated ?? true)
-        return new LogResponse();
-
-    var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-    if (!isAdmin && !string.IsNullOrEmpty(userId))
-    {
-        query = query.Where(e => e.UserId == userId);
-    }
-
-    if (!string.IsNullOrWhiteSpace(ip))
-        query = query.Where(e => e.Ip.Contains(ip));
-
-    if (!string.IsNullOrWhiteSpace(status))
-        query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
-
-    var total = await query.CountAsync();
-
-    if (pageSize <= 0)
-    {
-        // Return all logs (for export)
-        var allLogs = await query
-            .OrderByDescending(e => e.Timestamp)
-            .ToListAsync();
-
-        return new LogResponse
+        public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
         {
-            Total = total,
-            Logs = allLogs
-        };
-    }
+            var query = _db.LoginEvents.AsQueryable();
+            var user = httpContext.User;
+            var isAdmin = user.IsInRole("Admin");
 
-    // Paginated response (for UI)
-    if (page < 1) page = 1;
+            if (!user.Identity?.IsAuthenticated ?? true)
+                return new LogResponse();
 
-    var logs = await query
-        .OrderByDescending(e => e.Timestamp)
-        .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .ToListAsync();
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-    return new LogResponse
-    {
-        Total = total,
-        Logs = logs
-    };
-}
+            if (!isAdmin && !string.IsNullOrEmpty(userId))
+            {
+                query = query.Where(e => e.UserId == userId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ip))
+                query = query.Where(e => e.Ip.Contains(ip));
+
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+
+            var total = await query.CountAsync();
+
+            if (pageSize <= 0)
+            {
+                // Return all logs (for export)
+                var allLogs = await query
+                    .OrderByDescending(e => e.Timestamp)
+                    .ToListAsync();
+
+                return new LogResponse
+                {
+                    Total = total,
+                    Logs = allLogs
+                };
+            }
+
+            // Paginated response (for UI)
+            if (page < 1) page = 1;
+
+            var logs = await query
+                .OrderByDescending(e => e.Timestamp)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new LogResponse
+            {
+                Total = total,
+                Logs = logs
+            };
+        }
 
 
         public async Task<LogEventDetail?> GetLogDetailAsync(Guid id)
@@ -247,78 +247,78 @@ namespace ZTACS.Server.Services
             }
         }
         public async Task<List<LoginEvent>> GetAllLogs()
-{
-    return await _db.LoginEvents
-        .OrderByDescending(e => e.Timestamp)
-        .ToListAsync();
-}
+        {
+            return await _db.LoginEvents
+                .OrderByDescending(e => e.Timestamp)
+                .ToListAsync();
+        }
 
-public async Task<string> ExportLogsToCsv()
-{
-    var logs = await _db.LoginEvents.ToListAsync();
-    var csv = new StringBuilder();
-    csv.AppendLine("Id,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp");
+        public async Task<string> ExportLogsToCsv()
+        {
+            var logs = await _db.LoginEvents.ToListAsync();
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp");
 
-    foreach (var log in logs)
-    {
-        csv.AppendLine($"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
-    }
+            foreach (var log in logs)
+            {
+                csv.AppendLine($"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
+            }
 
-    return csv.ToString();
-}
+            return csv.ToString();
+        }
 
-public async Task BlockIp(BlockIpRequest request)
-{
-    if (!_blacklistedIps.Contains(request.IP))
-    {
-        _db.BlacklistedIps.Add(new BlacklistedIp { Ip = request.IP });
-        await _db.SaveChangesAsync();
-        _blacklistedIps.Add(request.IP);
-    }
-}
+        public async Task BlockIp(BlockIpRequest request)
+        {
+            if (!_blacklistedIps.Contains(request.IP))
+            {
+                _db.BlacklistedIps.Add(new BlacklistedIp { Ip = request.IP });
+                await _db.SaveChangesAsync();
+                _blacklistedIps.Add(request.IP);
+            }
+        }
 
-public async Task AddToWhitelist(WhitelistIpRequest request)
-{
-    var exists = await _db.WhitelistedIps.AnyAsync(x => x.Ip == request.IP);
-    if (!exists)
-    {
-        _db.WhitelistedIps.Add(new WhitelistedIp { Ip = request.IP });
-        await _db.SaveChangesAsync();
-    }
-}
+        public async Task AddToWhitelist(WhitelistIpRequest request)
+        {
+            var exists = await _db.WhitelistedIps.AnyAsync(x => x.Ip == request.IP);
+            if (!exists)
+            {
+                _db.WhitelistedIps.Add(new WhitelistedIp { Ip = request.IP });
+                await _db.SaveChangesAsync();
+            }
+        }
 
-public async Task RemoveFromWhitelist(WhitelistIpRequest request)
-{
-    var entry = await _db.WhitelistedIps.FirstOrDefaultAsync(x => x.Ip == request.IP);
-    if (entry != null)
-    {
-        _db.WhitelistedIps.Remove(entry);
-        await _db.SaveChangesAsync();
-    }
-}
+        public async Task RemoveFromWhitelist(WhitelistIpRequest request)
+        {
+            var entry = await _db.WhitelistedIps.FirstOrDefaultAsync(x => x.Ip == request.IP);
+            if (entry != null)
+            {
+                _db.WhitelistedIps.Remove(entry);
+                await _db.SaveChangesAsync();
+            }
+        }
 
-public async Task<List<string>> GetWhitelistedIps()
-{
-    return await _db.WhitelistedIps
-        .Select(w => w.Ip)
-        .ToListAsync();
-}
+        public async Task<List<string>> GetWhitelistedIps()
+        {
+            return await _db.WhitelistedIps
+                .Select(w => w.Ip)
+                .ToListAsync();
+        }
 
-public async Task<LogStatistics> GetLogStatisticsAsync()
-{
-    var total = await _db.LoginEvents.CountAsync();
-    var blocked = await _db.LoginEvents.CountAsync(e => e.Status == "blocked");
-    var suspicious = await _db.LoginEvents.CountAsync(e => e.Status == "suspicious");
-    var clean = total - blocked - suspicious;
+        public async Task<LogStatistics> GetLogStatisticsAsync()
+        {
+            var total = await _db.LoginEvents.CountAsync();
+            var blocked = await _db.LoginEvents.CountAsync(e => e.Status == "blocked");
+            var suspicious = await _db.LoginEvents.CountAsync(e => e.Status == "suspicious");
+            var clean = total - blocked - suspicious;
 
-    return new LogStatistics
-    {
-        Total = total,
-        Blocked = blocked,
-        Suspicious = suspicious,
-        Clean = clean
-    };
-}
+            return new LogStatistics
+            {
+                Total = total,
+                Blocked = blocked,
+                Suspicious = suspicious,
+                Clean = clean
+            };
+        }
 
     }
 }
