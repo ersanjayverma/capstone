@@ -2,7 +2,7 @@ using System;
 
 namespace ZTACS.Shared.Entities
 {
-    public class LogEventDetail:Base
+    public class LogEventDetail : Base
     {
         public Guid Id { get; set; }
         public string UserId { get; set; } = string.Empty;

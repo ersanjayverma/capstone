@@ -27,24 +27,24 @@ namespace ZTACS.Server.Middleware
 
             var user = context.User?.Identity?.IsAuthenticated == true
                 ? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                  ?? context.User.FindFirst(ClaimTypes.Email)?.Value
-                  ?? context.User.FindFirst(ClaimTypes.Name)?.Value
                   ?? "Unknown"
                 : "Anonymous";
-
-            // Scoped service
-            using var scope = _scopeFactory.CreateScope();
-            var threatService = scope.ServiceProvider.GetRequiredService<IThreatDetectionService>();
-
-            // Await async call
-            threatService.Analyze(new ThreatDetectionRequest
+            if (user != "Anonymous")
             {
-                Device = userAgent,
-                Endpoint = $"{method}:{path}{query}",
-                UserId = user,
-                Ip = ip,
-                Timestamp = DateTime.UtcNow
-            });
+                // Scoped service
+                using var scope = _scopeFactory.CreateScope();
+                var threatService = scope.ServiceProvider.GetRequiredService<IThreatDetectionService>();
+
+                // Await async call
+                threatService.Analyze(new ThreatDetectionRequest
+                {
+                    Device = userAgent,
+                    Endpoint = $"{method}:{path}{query}",
+                    UserId = user,
+                    Ip = ip,
+                    Timestamp = DateTime.UtcNow
+                });
+            }
 
             await _next(context);
         }

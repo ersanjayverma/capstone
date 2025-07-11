@@ -2,6 +2,7 @@
 @inject NavigationManager Navigation
 
 @code {
+
     protected override Task OnInitializedAsync()
     {
         var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK"; // 🔁 Replace with your actual client ID
@@ -15,4 +16,5 @@
         Navigation.NavigateTo(logoutUrl, forceLoad: true);
         return Task.CompletedTask;
     }
+
 }

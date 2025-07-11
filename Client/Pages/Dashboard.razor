@@ -39,26 +39,25 @@
             </MudItem>
         </MudGrid>
 
-        <MudDivider Class="my-1" />
+        <MudDivider Class="my-1"/>
 
         @if (ChartData.Any())
-                {
-        <MudText Typo="Typo.h6" Class="mt-4 mb-2">Threat Status Distribution</MudText>
+        {
+            <MudText Typo="Typo.h6" Class="mt-4 mb-2">Threat Status Distribution</MudText>
             <div class="content-scrollable">
-               @*  style="width: 100%; height: 30%; overflow: hidden;" *@
-             <ApexChart TItem="ChartPoint"
-                       Title="Threats">
+                @*  style="width: 100%; height: 30%; overflow: hidden;" *@
+                <ApexChart TItem="ChartPoint"
+                           Title="Threats">
 
-                <ApexPointSeries TItem="@ChartPoint"
-                                 Items="@ChartData"
-                                 Name="Threat Level"
-                                 XValue="@(p => p.Label)"
-                                 YAggregate="@(points => points.Sum(p => p.Value))"
-                                 OrderByDescending="p => p.Y"
-                                 SeriesType="SeriesType.Pie"
-                                 />
-            </ApexChart>
-        </div>
+                    <ApexPointSeries TItem="@ChartPoint"
+                                     Items="@ChartData"
+                                     Name="Threat Level"
+                                     XValue="@(p => p.Label)"
+                                     YAggregate="@(points => points.Sum(p => p.Value))"
+                                     OrderByDescending="p => p.Y"
+                                     SeriesType="SeriesType.Pie"/>
+                </ApexChart>
+            </div>
         }
 
         <MudButton StartIcon="@Icons.Material.Filled.Refresh"
@@ -91,13 +90,13 @@
         {
             ChartData = new List<ChartPoint>
             {
-                new() { Label = "Blocked", Value = Stats.Blocked, Color = "#FF4C4C" },     
-                new() { Label = "Suspicious", Value = Stats.Suspicious, Color = "4CAF50"}, 
-                new() { Label = "Clean", Value = Stats.Clean, Color =  "#FFD700" }         
+                new() { Label = "Blocked", Value = Stats.Blocked, Color = "#FF4C4C" },
+                new() { Label = "Suspicious", Value = Stats.Suspicious, Color = "4CAF50" },
+                new() { Label = "Clean", Value = Stats.Clean, Color = "#FFD700" }
             };
-
         }
 
         await InvokeAsync(StateHasChanged);
     }
+
 }

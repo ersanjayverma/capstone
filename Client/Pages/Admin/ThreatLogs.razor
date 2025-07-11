@@ -11,7 +11,7 @@
             <!-- Filters -->
             <MudGrid Class="mb-4">
                 <MudItem xs="12" sm="6">
-                    <MudTextField T="string" @bind-Value="ipFilter" Label="Filter by IP" Variant="Variant.Filled" />
+                    <MudTextField T="string" @bind-Value="ipFilter" Label="Filter by IP" Variant="Variant.Filled"/>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudSelect T="string" Label="Filter by Status" @bind-Value="statusFilter" Variant="Variant.Filled">
@@ -51,29 +51,27 @@
                 </HeaderContent>
 
                 <RowTemplate Context="row">
-                   
-                        <MudTd>@row.UserId</MudTd>
-                        <MudTd>@row.Ip</MudTd>
-                        <MudTd>@row.Device</MudTd>
-                        <MudTd>@row.Endpoint</MudTd>
-                        <MudTd>@row.Score</MudTd>
-                        <MudTd>@row.Status</MudTd>
-                        <MudTd>@row.Timestamp.ToLocalTime()</MudTd>
-                        <MudTd>
-                            <MudIconButton Icon="@Icons.Material.Filled.Info"
-                                           OnClick="@(() => ShowDetails(row))" />
-                        </MudTd>
-                 
 
-                    
-                  
+                    <MudTd>@row.UserId</MudTd>
+                    <MudTd>@row.Ip</MudTd>
+                    <MudTd>@row.Device</MudTd>
+                    <MudTd>@row.Endpoint</MudTd>
+                    <MudTd>@row.Score</MudTd>
+                    <MudTd>@row.Status</MudTd>
+                    <MudTd>@row.Timestamp.ToLocalTime()</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Info"
+                                       OnClick="@(() => ShowDetails(row))"/>
+                    </MudTd>
+
+
                 </RowTemplate>
 
                 <PagerContent>
                     <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="Justify.FlexStart" Spacing="1">
                         <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
                                        Disabled="@(currentPage == 1)"
-                                       OnClick="@PreviousPage" />
+                                       OnClick="@PreviousPage"/>
 
                         <MudText Class="mx-2">
                             Page @(currentPage) of @totalPages
@@ -81,11 +79,10 @@
 
                         <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
                                        Disabled="@((currentPage) >= totalPages)"
-                                       OnClick="@NextPage" />
+                                       OnClick="@NextPage"/>
                     </MudStack>
                 </PagerContent>
             </MudTable>
-
 
 
         </MudPaper>
@@ -104,6 +101,7 @@
     private int pageSize = 10;
     private int totalItems;
     private int totalPages => (int)Math.Ceiling((double)totalItems / pageSize);
+
     protected override async Task OnInitializedAsync()
     {
         var uri = Nav.ToAbsoluteUri(Nav.Uri);
@@ -115,8 +113,6 @@
 
     private async Task<TableData<LoginEvent>> LoadServerData(TableState state, CancellationToken c = new())
     {
-
-
         var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}&page={currentPage}&pageSize={10}";
         var response = await Http.GetFromJsonAsync<LogResponse>(url);
 
@@ -154,12 +150,12 @@
         Nav.NavigateTo(newUri, forceLoad: false); // Won't reload
         await table.ReloadServerData(); // Actually update table
     }
+
     public class PagedResult<T>
     {
         public List<T> Items { get; set; }
         public int TotalCount { get; set; }
     }
-
 
 
     private async Task ShowDetails(LoginEvent row)
@@ -179,12 +175,10 @@
             FullWidth = true,
             CloseOnEscapeKey = true,
             Position = DialogPosition.Center,
-         
         };
 
 
         await DialogService.ShowAsync<LogDetails>("Log Detail", parameters, options);
-
     }
 
 }

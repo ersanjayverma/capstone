@@ -6,6 +6,7 @@ using ZTACS.Server.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
 using System.Text;
+
 namespace ZTACS.Server.Services
 {
     public class ThreatDetectionService : IThreatDetectionService
@@ -134,21 +135,22 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null, int page = 1, int pageSize = 50)
+        public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null,
+            int page = 1, int pageSize = 50)
         {
             var query = _db.LoginEvents.AsQueryable();
             var user = httpContext.User;
-            var isAdmin = user.IsInRole("Admin");
+            //var isAdmin = user.IsInRole("Admin");
 
             if (!user.Identity?.IsAuthenticated ?? true)
                 return new LogResponse();
 
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (!isAdmin && !string.IsNullOrEmpty(userId))
-            {
-                query = query.Where(e => e.UserId == userId);
-            }
+            //if (!isAdmin && !string.IsNullOrEmpty(userId))
+            //{
+            //    query = query.Where(e => e.UserId == userId);
+            //}
 
             if (!string.IsNullOrWhiteSpace(ip))
                 query = query.Where(e => e.Ip.Contains(ip));
@@ -224,7 +226,8 @@ namespace ZTACS.Server.Services
             try
             {
                 using var client = new HttpClient();
-                var response = await client.GetAsync($"http://ip-api.com/json/{ip}?fields=status,country,city,isp,as,query");
+                var response =
+                    await client.GetAsync($"http://ip-api.com/json/{ip}?fields=status,country,city,isp,as,query");
                 if (!response.IsSuccessStatusCode) return default;
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -246,6 +249,7 @@ namespace ZTACS.Server.Services
                 return default;
             }
         }
+
         public async Task<List<LoginEvent>> GetAllLogs()
         {
             return await _db.LoginEvents
@@ -261,7 +265,8 @@ namespace ZTACS.Server.Services
 
             foreach (var log in logs)
             {
-                csv.AppendLine($"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
+                csv.AppendLine(
+                    $"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
             }
 
             return csv.ToString();
@@ -319,6 +324,5 @@ namespace ZTACS.Server.Services
                 Clean = clean
             };
         }
-
     }
 }

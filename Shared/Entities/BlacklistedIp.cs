@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ZTACS.Shared.Entities
 {
-    public class BlacklistedIp: Base
+    public class BlacklistedIp : Base
     {
         public string Ip { get; set; } = null!;
     }

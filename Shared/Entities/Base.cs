@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.ComponentModel.DataAnnotations;
+
 namespace ZTACS.Shared.Entities
 {
     public abstract class Base
@@ -18,7 +19,8 @@ namespace ZTACS.Shared.Entities
         public bool IsDeleted { get; set; } = false;
 
         public DateTime? DeletedAt { get; set; }
-                public static bool IsValidIp(string ip)
+
+        public static bool IsValidIp(string ip)
         {
             return IPAddress.TryParse(ip, out _);
         }

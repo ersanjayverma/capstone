@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+
 namespace ZTACS.Shared.Entities
 {
-    public class LoginEvent: Base
+    public class LoginEvent : Base
     {
         public string UserId { get; set; } = null!;
-    private string _ip = string.Empty;
+        private string _ip = string.Empty;
 
-    
+
         public string Ip
         {
             get => _ip;
@@ -22,6 +23,7 @@ namespace ZTACS.Shared.Entities
                 _ip = value;
             }
         }
+
         public string Device { get; set; } = null!;
         public string Endpoint { get; set; } = null!;
         public int? Score { get; set; }
@@ -29,5 +31,4 @@ namespace ZTACS.Shared.Entities
         public string Reason { get; set; } = string.Empty; // default reason
         public DateTime Timestamp { get; set; }
     }
-
 }

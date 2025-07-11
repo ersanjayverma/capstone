@@ -6,6 +6,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using System.Net.Http;
 using ZTACS.Client;
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 

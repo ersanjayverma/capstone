@@ -2,8 +2,10 @@
 @inject NavigationManager Navigation
 
 <h3>Redirecting to login</h3>
-    <RemoteAuthenticatorView Action="login" />
+<RemoteAuthenticatorView Action="login"/>
+
 @code {
+
     protected override void OnInitialized()
     {
         var realm = "ztacs";
@@ -11,7 +13,7 @@
         var clientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
 
         // Ensure trailing slash in Navigation.BaseUri
-        var redirectUri = Navigation.BaseUri.TrimEnd('/')+"/welcome";
+        var redirectUri = Navigation.BaseUri.TrimEnd('/') + "/welcome";
 
         var loginUrl = $"https://{domain}/realms/{realm}/protocol/openid-connect/auth" +
                        $"?client_id={clientId}" +
@@ -21,4 +23,5 @@
 
         Navigation.NavigateTo(loginUrl, forceLoad: true);
     }
+
 }

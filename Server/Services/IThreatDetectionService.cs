@@ -2,6 +2,7 @@
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
 using System.Text;
+
 namespace ZTACS.Server.Services
 {
     public interface IThreatDetectionService

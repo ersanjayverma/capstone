@@ -10,15 +10,15 @@
 
             <MudTextField @bind-Value="IpToCheck" Label="IP Address"
                           Color="Color.Primary" Variant="Variant.Filled"
-                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.NetworkCheck" />
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.NetworkCheck"/>
 
             <MudTextField @bind-Value="Device" Label="Device"
                           Color="Color.Primary" Variant="Variant.Filled"
-                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.PhoneIphone" Class="mt-3" />
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.PhoneIphone" Class="mt-3"/>
 
             <MudTextField @bind-Value="Endpoint" Label="Endpoint Accessed"
                           Color="Color.Primary" Variant="Variant.Filled"
-                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Http" Class="mt-3" />
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Http" Class="mt-3"/>
 
             <MudButton OnClick="RunAnalysis" Variant="Variant.Filled"
                        Color="Color.Secondary" Class="mt-4"
@@ -81,4 +81,5 @@
             Status = "❌ Error analyzing the threat. Try again.";
         }
     }
+
 }

@@ -12,27 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IThreatDetectionService, ThreatDetectionService>();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 builder.Services.AddDbContext<ThreatDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
-    //).EnableSensitiveDataLogging()
-    //.EnableDetailedErrors());
+//).EnableSensitiveDataLogging()
+//.EnableDetailedErrors());
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -132,20 +117,22 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseCors();
 
 
 app.UseHttpsRedirection();
 app.UseResponseCompression();
+
 app.UseBlazorFrameworkFiles();
-app.UseMiddleware<RequestLoggingMiddleware>();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication(); // ✅ Needed for JWT auth
-app.UseAuthorization();  // ✅ This line is MISSING and required!
+app.UseAuthorization(); // ✅ This line is MISSING and required!
 
-
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
