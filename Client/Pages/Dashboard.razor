@@ -49,13 +49,13 @@
             <ApexChart TItem="ChartPoint"
                        Title="Threats">
 
-                <ApexPointSeries TItem="ChartPoint"
-                                 Items="ChartData"
+                <ApexPointSeries TItem="@ChartPoint"
+                                 Items="@ChartData"
                                  Name="Threat Level"
                                  XValue="@(p => p.Label)"
                                  YAggregate="@(points => points.Sum(p => p.Value))"
                                  OrderByDescending="p => p.Y"
-                                 SeriesType="SeriesType.Bar"
+                                 SeriesType="SeriesType.Pie"
                                  Color="#E51C15" />
             </ApexChart>
         </div>

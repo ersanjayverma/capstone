@@ -4,7 +4,7 @@
   <PropertyGroup>
     <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtlXq61ivq0ijiw3TeY6bUAAAAAACAAAAAAAQZgAAAAEAACAAAAA9wdKEoZK5whkzlb1b6S5VIwnTzFwohep/Cd79tkNR6gAAAAAOgAAAAAIAACAAAABvpKZJ0VEgytPGjjmZFIiObRxjyMscAXLMr/exgEfTWSAAAABcrvFnH8OAZE7QaN4zUNdJwTgUrUUhGPOeIXtwjoQPd0AAAABjydyQoyjFmAohlCJQwbTcL9i56YgyNlaEows5s3F7BcsCa0G9EohtKASYcfhEulF0O2X3UKN2ogDPkSsg2e1j</EncryptedPassword>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <History>False|2025-07-11T16:11:03.0317907Z||;</History>
+    <History>True|2025-07-11T16:50:19.7049996Z||;False|2025-07-11T04:47:29.8205773-12:00||;False|2025-07-11T04:42:46.5184720-12:00||;False|2025-07-11T04:11:03.0317907-12:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>
