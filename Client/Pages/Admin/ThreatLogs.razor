@@ -26,102 +26,102 @@
                 Apply Filters
             </MudButton>
 
-            <<MudTable T="LoginEvent"
-          @ref="table"
-          ServerData="LoadServerData"
-          RowsPerPage="@pageSize"
-          Breakpoint="Breakpoint.Sm"
-          Bordered="true"
-          Hover="true"
-          Dense="true"
-          Elevation="1"
-          Class="mt-4"
-          @bind-CurrentPage="@currentPage">
+            <MudTable T="LoginEvent"
+                      @ref="table"
+                      ServerData="LoadServerData"
+                      RowsPerPage="@pageSize"
+                      Breakpoint="Breakpoint.Sm"
+                      Bordered="true"
+                      Hover="true"
+                      Dense="true"
+                      Elevation="1"
+                      Class="mt-4"
+                      @bind-CurrentPage="@currentPage">
 
-    <HeaderContent>
-        <MudTh>User ID</MudTh>
-        <MudTh>IP</MudTh>
-        <MudTh>Device</MudTh>
-        <MudTh>Endpoint</MudTh>
-        <MudTh>Score</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Timestamp</MudTh>
-        <MudTh></MudTh>
-    </HeaderContent>
+                <HeaderContent>
+                    <MudTh>User ID</MudTh>
+                    <MudTh>IP</MudTh>
+                    <MudTh>Device</MudTh>
+                    <MudTh>Endpoint</MudTh>
+                    <MudTh>Score</MudTh>
+                    <MudTh>Status</MudTh>
+                    <MudTh>Timestamp</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
 
-    <RowTemplate Context="row">
-        @<MudTr>
-            <MudTd>@row.UserId</MudTd>
-            <MudTd>@row.Ip</MudTd>
-            <MudTd>@row.Device</MudTd>
-            <MudTd>@row.Endpoint</MudTd>
-            <MudTd>@row.Score</MudTd>
-            <MudTd>@row.Status</MudTd>
-            <MudTd>@row.Timestamp.ToLocalTime()</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.ExpandMore"
-                               OnClick="@(() => ToggleExpanded(row.Id))" />
-            </MudTd>
-        </MudTr>
+                <RowTemplate Context="row">
+                    @<MudTr>
+                        <MudTd>@row.UserId</MudTd>
+                        <MudTd>@row.Ip</MudTd>
+                        <MudTd>@row.Device</MudTd>
+                        <MudTd>@row.Endpoint</MudTd>
+                        <MudTd>@row.Score</MudTd>
+                        <MudTd>@row.Status</MudTd>
+                        <MudTd>@row.Timestamp.ToLocalTime()</MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.ExpandMore"
+                                           OnClick="@(() => ToggleExpanded(row.Id))" />
+                        </MudTd>
+                    </MudTr>
 
-        @if (expandedId == row.Id)
-        {
-            <MudTr>
-                <MudTd ColSpan="8" Class="pa-0">
-                    @if (expandedDetail is null)
+                    @if (expandedId == row.Id)
                     {
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <MudTr>
+                            <MudTd ColSpan="8" Class="pa-0">
+                                @if (expandedDetail is null)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                                }
+                                else
+                                {
+                                    <MudPaper Class="pa-3">
+                                        <MudGrid>
+                                            <MudItem xs="12" sm="6">
+                                                <MudText><b>User ID:</b> @expandedDetail.UserId</MudText>
+                                                <MudText><b>Device:</b> @expandedDetail.Device</MudText>
+                                                <MudText><b>Endpoint:</b> @expandedDetail.Endpoint</MudText>
+                                                <MudText><b>User Agent:</b> @expandedDetail.UserAgent</MudText>
+                                            </MudItem>
+                                            <MudItem xs="12" sm="6">
+                                                <MudText><b>Location:</b> @expandedDetail.City, @expandedDetail.Country</MudText>
+                                                <MudText><b>ISP:</b> @expandedDetail.ISP</MudText>
+                                                <MudText><b>ASN:</b> @expandedDetail.ASN</MudText>
+                                                <MudText><b>Whitelisted:</b> @expandedDetail.IsWhitelisted</MudText>
+                                                <MudText><b>Blocked:</b> @expandedDetail.IsBlocked</MudText>
+                                            </MudItem>
+                                            <MudItem xs="12">
+                                                <MudText><b>Request Headers:</b></MudText>
+                                                <MudList T="string" Dense="true">
+                                                    @foreach (var h in expandedDetail.RequestHeaders ?? Array.Empty<string>())
+                                                    {
+                                                        <MudListItem>@h</MudListItem>
+                                                    }
+                                                </MudList>
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudPaper>
+                                }
+                            </MudTd>
+                        </MudTr>
                     }
-                    else
-                    {
-                        <MudPaper Class="pa-3">
-                            <MudGrid>
-                                <MudItem xs="12" sm="6">
-                                    <MudText><b>User ID:</b> @expandedDetail.UserId</MudText>
-                                    <MudText><b>Device:</b> @expandedDetail.Device</MudText>
-                                    <MudText><b>Endpoint:</b> @expandedDetail.Endpoint</MudText>
-                                    <MudText><b>User Agent:</b> @expandedDetail.UserAgent</MudText>
-                                </MudItem>
-                                <MudItem xs="12" sm="6">
-                                    <MudText><b>Location:</b> @expandedDetail.City, @expandedDetail.Country</MudText>
-                                    <MudText><b>ISP:</b> @expandedDetail.ISP</MudText>
-                                    <MudText><b>ASN:</b> @expandedDetail.ASN</MudText>
-                                    <MudText><b>Whitelisted:</b> @expandedDetail.IsWhitelisted</MudText>
-                                    <MudText><b>Blocked:</b> @expandedDetail.IsBlocked</MudText>
-                                </MudItem>
-                                <MudItem xs="12">
-                                    <MudText><b>Request Headers:</b></MudText>
-                                    <MudList T="string" Dense="true">
-                                        @foreach (var h in expandedDetail.RequestHeaders ?? Array.Empty<string>())
-                                        {
-                                            <MudListItem>@h</MudListItem>
-                                        }
-                                    </MudList>
-                                </MudItem>
-                            </MudGrid>
-                        </MudPaper>
-                    }
-                </MudTd>
-            </MudTr>
-        }
-    </RowTemplate>
+                </RowTemplate>
 
-    <PagerContent>
-        <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="Justify.FlexStart" Spacing="1">
-            <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
-                           Disabled="@(currentPage == 0)"
-                           OnClick="@PreviousPage" />
+                <PagerContent>
+                    <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="Justify.FlexStart" Spacing="1">
+                        <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft"
+                                       Disabled="@(currentPage == 0)"
+                                       OnClick="@PreviousPage" />
 
-            <MudText Class="mx-2">
-                Page @(currentPage + 1) of @totalPages
-            </MudText>
+                        <MudText Class="mx-2">
+                            Page @(currentPage + 1) of @totalPages
+                        </MudText>
 
-            <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
-                           Disabled="@((currentPage + 1) >= totalPages)"
-                           OnClick="@NextPage" />
-        </MudStack>
-    </PagerContent>
-</MudTable>
+                        <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
+                                       Disabled="@((currentPage + 1) >= totalPages)"
+                                       OnClick="@NextPage" />
+                    </MudStack>
+                </PagerContent>
+            </MudTable>
 
 
 
