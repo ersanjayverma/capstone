@@ -16,7 +16,7 @@ namespace ZTACS.Shared.Models
         // Constructor
         public ChartPoint() { }
 
-        public ChartPoint(string label, double value, string? color = null, string? tooltip = null, string? category = null)
+        public ChartPoint(string label, decimal value, string? color = null, string? tooltip = null, string? category = null)
         {
             Label = label;
             Value = value;
