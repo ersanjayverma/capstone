@@ -65,11 +65,12 @@ a, .btn-link {
 
 .mud-main-content {
     position: relative;
-    background-color: #121212 !important; /* Dark gray instead of pure black */
-    min-height: 100vh;
+    background-color: #121212 !important;
+    height: 100dvh; /* Use dynamic visible viewport height */
+    overflow: auto; /* Scroll if content is too big */
+    display: flex;
+    flex-direction: column; /* So children stack vertically */
     z-index: 0;
-    overflow: hidden;
-    padding-top: 64px; /* Adjust based on navbar height */
 }
 
     .mud-main-content::before {
