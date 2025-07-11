@@ -29,9 +29,9 @@ builder.Services.AddScoped<IThreatDetectionService, ThreatDetectionService>();
 builder.Services.AddDbContext<ThreatDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
-    ).EnableSensitiveDataLogging()
-    .EnableDetailedErrors());
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+    //).EnableSensitiveDataLogging()
+    //.EnableDetailedErrors());
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
