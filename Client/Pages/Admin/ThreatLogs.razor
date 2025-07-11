@@ -46,6 +46,7 @@
                     <MudTh>Score</MudTh>
                     <MudTh>Status</MudTh>
                     <MudTh>Timestamp</MudTh>
+                    <MudTh></MudTh> <!-- expand toggle -->
                 </HeaderContent>
 
                 <RowTemplate Context="con">
@@ -56,6 +57,44 @@
                     <MudTd DataLabel="Score">@con.Score</MudTd>
                     <MudTd DataLabel="Status">@con.Status</MudTd>
                     <MudTd DataLabel="Timestamp">@con.Timestamp.ToLocalTime()</MudTd>
+
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.ExpandMore"
+                                       @onclick="() => ToggleExpanded(con.Id)" />
+                    </MudTd>
+                </RowTemplate>
+                <RowTemplate Context ="newcontext">
+                    @if (expandedId == newcontext.Id)
+                    {
+                        <MudTd ColSpan="6" Class="pa-3">
+                            <MudPaper Class="pa-3">
+                                <MudGrid>
+                                    <MudItem xs="12" sm="6">
+                                        <MudText><b>User ID:</b> @expandedDetail.UserId</MudText>
+                                        <MudText><b>Device:</b> @expandedDetail.Device</MudText>
+                                        <MudText><b>Endpoint:</b> @expandedDetail.Endpoint</MudText>
+                                        <MudText><b>User Agent:</b> @expandedDetail.UserAgent</MudText>
+                                    </MudItem>
+                                    <MudItem xs="12" sm="6">
+                                        <MudText><b>Location:</b> @expandedDetail.City, @expandedDetail.Country</MudText>
+                                        <MudText><b>ISP:</b> @expandedDetail.ISP</MudText>
+                                        <MudText><b>ASN:</b> @expandedDetail.ASN</MudText>
+                                        <MudText><b>Whitelisted:</b> @expandedDetail.IsWhitelisted</MudText>
+                                        <MudText><b>Blocked:</b> @expandedDetail.IsBlocked</MudText>
+                                    </MudItem>
+                                    <MudItem xs="12">
+                                        <MudText><b>Request Headers:</b></MudText>
+                                        <MudList T="string" Dense="true">
+                                            @foreach (var h in expandedDetail.RequestHeaders ?? Array.Empty<string>())
+                                            {
+                                                <MudListItem>@h</MudListItem>
+                                            }
+                                        </MudList>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudPaper>
+                        </MudTd>
+                    }
                 </RowTemplate>
 <PagerContent>
               <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="Justify.FlexStart" Spacing="1">
@@ -93,6 +132,9 @@
     private int totalPages => (int)Math.Ceiling((double)totalItems / pageSize);
     private bool canPrevious => currentPage > 1;
     private bool canNext => currentPage < totalPages;
+    List<LogEventDetail> Logs = new(); 
+    Guid? expandedId;
+    LogEventDetail? expandedDetail;
     protected override async Task OnInitializedAsync()
     {
         var uri = Nav.ToAbsoluteUri(Nav.Uri);
@@ -104,7 +146,7 @@
 
     private async Task<TableData<LoginEvent>> LoadServerData(TableState state,CancellationToken c = new())
     {
-       
+
 
         var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}&page={currentPage}&pageSize={10}";
         var response = await Http.GetFromJsonAsync<LogResponse>(url);
@@ -144,8 +186,33 @@
         await table.ReloadServerData(); // Actually update table
     }
     public class PagedResult<T>
-{
-    public List<T> Items { get; set; }
-    public int TotalCount { get; set; }
-}
+    {
+        public List<T> Items { get; set; }
+        public int TotalCount { get; set; }
+    }
+
+    async void ToggleExpanded(Guid id)
+    {
+        if (expandedId == id)
+        {
+            expandedId = null;
+            expandedDetail = null;
+            return;
+        }
+
+        expandedId = id;
+        expandedDetail = null;
+
+        // 🔁 Simulate async fetch (replace with your service/API call)
+        await Task.Delay(200); // optional spinner delay
+        expandedDetail = await FetchDetailById(id);
+    }
+
+    async Task<LogEventDetail> FetchDetailById(Guid id)
+    {
+        var url = $"api/ThreatDetection/logs/{id}";
+        var response = await Http.GetFromJsonAsync<LogEventDetail>(url);
+        return response ?? new LogEventDetail();
+    }
+
 }
