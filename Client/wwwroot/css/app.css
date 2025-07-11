@@ -66,12 +66,19 @@ a, .btn-link {
 .mud-main-content {
     position: relative;
     background-color: #121212 !important;
-    height: 100dvh; /* Use dynamic visible viewport height */
-    overflow: auto; /* Scroll if content is too big */
+    height: 100dvh;
     display: flex;
-    flex-direction: column; /* So children stack vertically */
-    z-index: 0;
+    flex-direction: column;
+    overflow: hidden; /* Prevent any overflow outside */
 }
+
+    .mud-main-content > .content-scrollable {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: 0; /* required for flex child scroll */
+    }
+
 
     .mud-main-content::before {
         content: "";
