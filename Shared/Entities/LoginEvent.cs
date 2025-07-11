@@ -3,13 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.ComponentModel.DataAnnotations;
 namespace ZTACS.Shared.Entities
 {
     public class LoginEvent: Base
     {
         public string UserId { get; set; } = null!;
-        public string Ip { get; set; } = null!;
+    private string _ip = string.Empty;
+
+    
+        public string Ip
+        {
+            get => _ip;
+            set
+            {
+                if (!IsValidIp(value))
+                    throw new ValidationException("Invalid IP address.");
+                _ip = value;
+            }
+        }
         public string Device { get; set; } = null!;
         public string Endpoint { get; set; } = null!;
         public int? Score { get; set; }
