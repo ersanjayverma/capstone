@@ -1,7 +1,8 @@
 ﻿@page "/admin/threat-logs"
+@using ZTACS.Client.Pages.Components
 @inject HttpClient Http
 @inject NavigationManager Nav
-
+@inject IDialogService DialogService
 <AuthorizeView>
     <Authorized>
         <MudPaper Class="pa-4 mt-6" Style="background-color:#1e1e2f; color: #fff;">
@@ -50,7 +51,7 @@
                 </HeaderContent>
 
                 <RowTemplate Context="row">
-                    <MudTr>
+                   
                         <MudTd>@row.UserId</MudTd>
                         <MudTd>@row.Ip</MudTd>
                         <MudTd>@row.Device</MudTd>
@@ -59,51 +60,13 @@
                         <MudTd>@row.Status</MudTd>
                         <MudTd>@row.Timestamp.ToLocalTime()</MudTd>
                         <MudTd>
-                            <MudIconButton Icon="@Icons.Material.Filled.ExpandMore"
-                                           OnClick="@(() => ToggleExpanded(row.Id))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Info"
+                                           OnClick="@(() => ShowDetails(row))" />
                         </MudTd>
-                    </MudTr>
+                 
 
-                    @if (expandedId == row.Id)
-                    {
-                        <MudTr>
-                            <MudTd ColSpan="8" Class="pa-0">
-                                @if (expandedDetail is null)
-                                {
-                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                                }
-                                else
-                                {
-                                    <MudPaper Class="pa-3">
-                                        <MudGrid>
-                                            <MudItem xs="12" sm="6">
-                                                <MudText><b>User ID:</b> @expandedDetail.UserId</MudText>
-                                                <MudText><b>Device:</b> @expandedDetail.Device</MudText>
-                                                <MudText><b>Endpoint:</b> @expandedDetail.Endpoint</MudText>
-                                                <MudText><b>User Agent:</b> @expandedDetail.UserAgent</MudText>
-                                            </MudItem>
-                                            <MudItem xs="12" sm="6">
-                                                <MudText><b>Location:</b> @expandedDetail.City, @expandedDetail.Country</MudText>
-                                                <MudText><b>ISP:</b> @expandedDetail.ISP</MudText>
-                                                <MudText><b>ASN:</b> @expandedDetail.ASN</MudText>
-                                                <MudText><b>Whitelisted:</b> @expandedDetail.IsWhitelisted</MudText>
-                                                <MudText><b>Blocked:</b> @expandedDetail.IsBlocked</MudText>
-                                            </MudItem>
-                                            <MudItem xs="12">
-                                                <MudText><b>Request Headers:</b></MudText>
-                                                <MudList T="string" Dense="true">
-                                                    @foreach (var h in expandedDetail.RequestHeaders ?? Array.Empty<string>())
-                                                    {
-                                                        <MudListItem>@h</MudListItem>
-                                                    }
-                                                </MudList>
-                                            </MudItem>
-                                        </MudGrid>
-                                    </MudPaper>
-                                }
-                            </MudTd>
-                        </MudTr>
-                    }
+                    
+                  
                 </RowTemplate>
 
                 <PagerContent>
@@ -113,11 +76,11 @@
                                        OnClick="@PreviousPage" />
 
                         <MudText Class="mx-2">
-                            Page @(currentPage + 1) of @totalPages
+                            Page @(currentPage) of @totalPages
                         </MudText>
 
                         <MudIconButton Icon="@Icons.Material.Filled.ChevronRight"
-                                       Disabled="@((currentPage + 1) >= totalPages)"
+                                       Disabled="@((currentPage) >= totalPages)"
                                        OnClick="@NextPage" />
                     </MudStack>
                 </PagerContent>
@@ -141,11 +104,6 @@
     private int pageSize = 10;
     private int totalItems;
     private int totalPages => (int)Math.Ceiling((double)totalItems / pageSize);
-    private bool canPrevious => currentPage > 1;
-    private bool canNext => currentPage < totalPages;
-    List<LogEventDetail> Logs = new();
-    Guid? expandedId;
-    LogEventDetail? expandedDetail;
     protected override async Task OnInitializedAsync()
     {
         var uri = Nav.ToAbsoluteUri(Nav.Uri);
@@ -202,28 +160,31 @@
         public int TotalCount { get; set; }
     }
 
-    async void ToggleExpanded(Guid id)
+
+
+    private async Task ShowDetails(LoginEvent row)
     {
-        if (expandedId == id)
-        {
-            expandedId = null;
-            expandedDetail = null;
-            return;
-        }
-
-        expandedId = id;
-        expandedDetail = null;
-
-        // 🔁 Simulate async fetch (replace with your service/API call)
-        await Task.Delay(200); // optional spinner delay
-        expandedDetail = await FetchDetailById(id);
-    }
-
-    async Task<LogEventDetail> FetchDetailById(Guid id)
-    {
-        var url = $"api/ThreatDetection/logs/{id}";
+        var url = $"api/ThreatDetection/logs/{row.Id}";
         var response = await Http.GetFromJsonAsync<LogEventDetail>(url);
-        return response ?? new LogEventDetail();
+
+        var parameters = new DialogParameters
+        {
+            ["Detail"] = response
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseOnEscapeKey = true,
+            Position = DialogPosition.Center,
+         
+        };
+
+
+        await DialogService.ShowAsync<LogDetails>("Log Detail", parameters, options);
+
     }
 
 }

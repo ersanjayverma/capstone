@@ -23,10 +23,10 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.Authority = "https://auth.blackhatbadshah.com/realms/ztacs";
     options.ProviderOptions.ClientId = "25pSHCWTZQHPupUPAXimVmvcIDKaUIEK";
     options.ProviderOptions.ResponseType = "code";
-    options.ProviderOptions.RedirectUri = "https://capstone.blackhatbadshah.com/welcome";
+    options.ProviderOptions.RedirectUri = "https://localhost:7017/welcome";
 
     // Optional but recommended
-    options.ProviderOptions.PostLogoutRedirectUri = "https://capstone.blackhatbadshah.com/bye";
+    options.ProviderOptions.PostLogoutRedirectUri = "https://localhost:7017/bye";
     options.ProviderOptions.DefaultScopes.Add("openid");
     options.ProviderOptions.DefaultScopes.Add("profile");
     options.ProviderOptions.DefaultScopes.Add("email");

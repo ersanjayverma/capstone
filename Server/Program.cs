@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ZTACS.Server.Data;
+using ZTACS.Server.Middleware;
 using ZTACS.Server.Services;
 
 
@@ -40,7 +41,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://capstone.blackhatbadshah.com") // or your client URL
+        policy.WithOrigins("https://capstone.blackhatbadshah.com,https://localhost:7017") // or your client URL
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -134,15 +135,16 @@ else
 app.UseCors();
 
 
-
 app.UseHttpsRedirection();
 app.UseResponseCompression();
 app.UseBlazorFrameworkFiles();
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication(); // ✅ Needed for JWT auth
 app.UseAuthorization();  // ✅ This line is MISSING and required!
+
 
 app.MapRazorPages();
 app.MapControllers();

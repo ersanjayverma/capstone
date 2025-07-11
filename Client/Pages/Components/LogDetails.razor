@@ -1,0 +1,47 @@
+﻿<MudDialog>
+    <DialogContent>
+        @if (Detail is null)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else
+        {
+            <MudPaper Class="pa-3">
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudText><b>User ID:</b> @Detail.UserId</MudText>
+                        <MudText><b>Device:</b> @Detail.Device</MudText>
+                        <MudText><b>Endpoint:</b> @Detail.Endpoint</MudText>
+                        <MudText><b>User Agent:</b> @Detail.UserAgent</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudText><b>Location:</b> @Detail.City, @Detail.Country</MudText>
+                        <MudText><b>ISP:</b> @Detail.ISP</MudText>
+                        <MudText><b>ASN:</b> @Detail.ASN</MudText>
+                        <MudText><b>Whitelisted:</b> @Detail.IsWhitelisted</MudText>
+                        <MudText><b>Blocked:</b> @Detail.IsBlocked</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText><b>Request Headers:</b></MudText>
+                        <MudList T="string" Dense="true">
+                            @foreach (var h in Detail.RequestHeaders ?? Array.Empty<string>())
+                            {
+                                <MudListItem>@h</MudListItem>
+                            }
+                        </MudList>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog?.Close()">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudBlazor.IDialogReference MudDialog { get; set; }
+
+    [Parameter] public LogEventDetail Detail { get; set; }
+}
