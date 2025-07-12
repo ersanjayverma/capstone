@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZTACS.Server.Data;
 
@@ -11,9 +12,11 @@ using ZTACS.Server.Data;
 namespace ZTACS.Server.Migrations
 {
     [DbContext(typeof(ThreatDbContext))]
-    partial class ThreatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250712013056_UserAdd")]
+    partial class UserAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

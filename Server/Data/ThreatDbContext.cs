@@ -34,5 +34,6 @@ namespace ZTACS.Server.Data
         public DbSet<LoginEvent> LoginEvents { get; set; }
         public DbSet<LogEventDetail> LogEventDetails { get; set; }
         public DbSet<WhitelistedIp> WhitelistedIps { get; set; } = default!;
+         public DbSet<UserProfile> UserProfiles { get; set; } = default!;
     }
 }
