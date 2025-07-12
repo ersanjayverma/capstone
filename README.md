@@ -36,24 +36,35 @@
 
 # Frontend	Blazor
 
-
-
-✅ PROGRESS VS VISION: A QUICK MATCH
-ZTACS Component	Status	Notes
-Authentication (JWT/OAuth2)	✅ Done	Keycloak integrated with claims
-Device Fingerprinting	⚠️ Pending	Currently only "BlazorWASM" string — extend to fingerprint
-Real-time Behavior Monitoring	✅ Core Done	Login logs, threat scoring, enrichment complete
-Threat Scoring System	✅ Done	Risk-based scores + reasons
-Policy Engine (Role + Context)	🟡 Started	Role-based logic placeholder; dynamic policies next
-Audit Dashboard	✅ Basic Done	Working logs, profiles — UI powered
-Realtime Updates (SignalR)	❌ Not yet	Next milestone
-Export / Reporting	🟡 CSV Done	PDF exports, compliance reports pending
-DevOps (CI/CD, Containers)	🟡 Docker OK	Needs GitHub Actions + Kubernetes setup
-Monitoring (Grafana, Prometheus)	❌ Not yet	Final milestone
-
 # Authentication	OAuth2 / JWT
 
 # Data Store	MYSQL , Redis (session), ElasticSearch (logs)
 
 # DevOps	Docker, Kubernetes, GitHub Actions Monitoring Prometheus, Grafana
+
+
+
+✅ PROGRESS VS VISION: A QUICK MATCH
+
+ZTACS Component	Status	Notes
+
+Authentication (JWT/OAuth2)	✅ Done	Keycloak integrated with claims
+
+Device Fingerprinting	⚠️ Pending	Currently only "BlazorWASM" string — extend to fingerprint
+
+Real-time Behavior Monitoring	✅ Core Done	Login logs, threat scoring, enrichment complete
+
+Threat Scoring System	✅ Done	Risk-based scores + reasons
+
+Policy Engine (Role + Context)	🟡 Started	Role-based logic placeholder; dynamic policies next
+
+Audit Dashboard	✅ Basic Done	Working logs, profiles — UI powered
+
+Realtime Updates (SignalR)	❌ Not yet	Next milestone
+
+Export / Reporting	🟡 CSV Done	PDF exports, compliance reports pending
+
+DevOps (CI/CD, Containers)	🟡 Docker OK	Needs GitHub Actions + Kubernetes setup
+
+Monitoring (Grafana, Prometheus)	❌ Not yet	Final milestone
 
