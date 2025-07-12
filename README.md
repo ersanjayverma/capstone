@@ -63,6 +63,7 @@ Audit Dashboard	✅ Basic Done	Working logs, profiles — UI powered
 Realtime Updates (SignalR)	❌ Not yet	Next milestone
 
 
+Monitoring (Grafana, Prometheus)	❌ Not yet	Final milestone
 
 
 What I’ve built so far is **an excellent MVP** — but **“business-ready”** is a much higher bar.
@@ -180,19 +181,5 @@ If you ever plan to **sell ZTACS to others**, not just use internally:
 3. ✅ Configurable rule engine with admin UI
 4. ✅ Docker/K8s/Helm for deployability
 5. ✅ Real-time & background tasks
-6. ✅ Multi-tenant model if SaaS
-
----
-
-Let me know if you want:
-
-* A **Kanban Board Template** (Notion/Jira) for this roadmap
-* Or help **starting the policy engine** right now.
-
-
-Export / Reporting	🟡 CSV Done	PDF exports, compliance reports pending
-
-DevOps (CI/CD, Containers)	🟡 Docker OK	Needs GitHub Actions + Kubernetes setup
-
-Monitoring (Grafana, Prometheus)	❌ Not yet	Final milestone
+6. ✅ Multi-tenant model
 
