@@ -120,13 +120,14 @@ namespace ZTACS.Server.Services
 
     public async Task EnrichProfileFromThreatRequestAsync(HttpContext context,UserProfile profile, ThreatDetectionRequest request)
 {
+    request.Ip = ExtractClientIp(context);
     profile.LastIp = request.Ip;
     profile.LastDevice = request.Device;
     profile.LastEndpoint = request.Endpoint;
     profile.LastScore = request.Score;
     profile.LastStatus = request.Status;
     profile.LastReason = request.Reason;
-    request.Ip = ExtractClientIp(context);
+   
 
     // Always enrich
     var (country, city, isp, asn) = await EnrichIpAsync(request.Ip);
