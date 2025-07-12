@@ -10,7 +10,7 @@ using ZTACS.Server.Services;
 var builder = WebApplication.CreateBuilder(args);
 //Main Services
 builder.Services.AddScoped<IThreatDetectionService, ThreatDetectionService>();
-
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
 builder.Services.AddDbContext<ThreatDbContext>(options =>
     options.UseMySql(

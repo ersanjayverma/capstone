@@ -12,8 +12,8 @@ using ZTACS.Server.Data;
 namespace ZTACS.Server.Migrations
 {
     [DbContext(typeof(ThreatDbContext))]
-    [Migration("20250711021623_InitialModification")]
-    partial class InitialModification
+    [Migration("20250712030941_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,12 +101,18 @@ namespace ZTACS.Server.Migrations
                     b.Property<bool>("IsWhitelisted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<Guid>("LoginEventId")
+                        .HasColumnType("char(36)");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("RequestHeaders")
+                    b.Property<string>("Region")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RequestHeadersJson")
                         .HasColumnType("longtext");
 
                     b.Property<int?>("Score")
@@ -131,6 +137,8 @@ namespace ZTACS.Server.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LoginEventId");
 
                     b.ToTable("LogEventDetails");
                 });
@@ -188,6 +196,101 @@ namespace ZTACS.Server.Migrations
                     b.ToTable("LoginEvents");
                 });
 
+            modelBuilder.Entity("ZTACS.Shared.Entities.UserProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsWhitelisted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("KeycloakId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastASN")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastCity")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastCountry")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastDevice")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastEndpoint")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastISP")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastIp")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("LastLogin")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastRegion")
+                        .HasColumnType("longtext");
+
+                    b.Property<float?>("LastScore")
+                        .HasColumnType("float");
+
+                    b.Property<string>("LastStatus")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Locale")
+                        .HasColumnType("longtext");
+
+                    b.Property<byte[]>("ProfileImage")
+                        .HasColumnType("longblob");
+
+                    b.Property<string>("Roles")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserProfiles");
+                });
+
             modelBuilder.Entity("ZTACS.Shared.Entities.WhitelistedIp", b =>
                 {
                     b.Property<Guid>("Id")
@@ -213,6 +316,17 @@ namespace ZTACS.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WhitelistedIps");
+                });
+
+            modelBuilder.Entity("ZTACS.Shared.Entities.LogEventDetail", b =>
+                {
+                    b.HasOne("ZTACS.Shared.Entities.LoginEvent", "LoginEvent")
+                        .WithMany()
+                        .HasForeignKey("LoginEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoginEvent");
                 });
 #pragma warning restore 612, 618
         }

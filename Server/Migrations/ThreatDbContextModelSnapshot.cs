@@ -98,12 +98,18 @@ namespace ZTACS.Server.Migrations
                     b.Property<bool>("IsWhitelisted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<Guid>("LoginEventId")
+                        .HasColumnType("char(36)");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("RequestHeaders")
+                    b.Property<string>("Region")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RequestHeadersJson")
                         .HasColumnType("longtext");
 
                     b.Property<int?>("Score")
@@ -128,6 +134,8 @@ namespace ZTACS.Server.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LoginEventId");
 
                     b.ToTable("LogEventDetails");
                 });
@@ -216,43 +224,47 @@ namespace ZTACS.Server.Migrations
                     b.Property<bool>("IsWhitelisted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("KeycloakId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastASN")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastCity")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastCountry")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastDevice")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastEndpoint")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastISP")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastIp")
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("LastLogin")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("LastLoginASN")
+                    b.Property<string>("LastName")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("LastLoginCity")
+                    b.Property<string>("LastReason")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("LastLoginCountry")
+                    b.Property<string>("LastRegion")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("LastLoginDevice")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastLoginEndpoint")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastLoginISP")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastLoginIp")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastLoginReason")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastLoginRegion")
-                        .HasColumnType("longtext");
-
-                    b.Property<float?>("LastLoginScore")
+                    b.Property<float?>("LastScore")
                         .HasColumnType("float");
 
-                    b.Property<string>("LastLoginStatus")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastName")
+                    b.Property<string>("LastStatus")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Locale")
@@ -266,10 +278,6 @@ namespace ZTACS.Server.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -305,6 +313,17 @@ namespace ZTACS.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WhitelistedIps");
+                });
+
+            modelBuilder.Entity("ZTACS.Shared.Entities.LogEventDetail", b =>
+                {
+                    b.HasOne("ZTACS.Shared.Entities.LoginEvent", "LoginEvent")
+                        .WithMany()
+                        .HasForeignKey("LoginEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoginEvent");
                 });
 #pragma warning restore 612, 618
         }

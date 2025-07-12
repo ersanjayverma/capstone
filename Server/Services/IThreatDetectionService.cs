@@ -7,7 +7,7 @@ namespace ZTACS.Server.Services
 {
     public interface IThreatDetectionService
     {
-        ThreatDetectionResponse Analyze(ThreatDetectionRequest request);
+        ThreatDetectionResponse Analyze( HttpContext httpContext,ThreatDetectionRequest request);
 
         Task<LogResponse> GetLogs(
             HttpContext httpContext,
@@ -20,6 +20,8 @@ namespace ZTACS.Server.Services
         Task<LogEventDetail?> GetLogDetailAsync(Guid id);
 
         Task<List<LoginEvent>> GetAllLogs();
+        Task EnrichProfileFromThreatRequestAsync( HttpContext httpContext,UserProfile profile, ThreatDetectionRequest request);
+
 
         Task<string> ExportLogsToCsv();
 
@@ -28,7 +30,7 @@ namespace ZTACS.Server.Services
         Task AddToWhitelist(WhitelistIpRequest request);
 
         Task RemoveFromWhitelist(WhitelistIpRequest request);
-
+        string ExtractClientIp(HttpContext context);
         Task<List<string>> GetWhitelistedIps();
 
         Task<LogStatistics> GetLogStatisticsAsync();

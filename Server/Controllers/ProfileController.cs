@@ -30,7 +30,7 @@ namespace ZTACS.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Upsert([FromBody] ThreatDetectionRequest threatRequest)
         {
-            await _profileService.UpsertFromLoginAsync(User, threatRequest);
+            await _profileService.UpsertFromLoginAsync(HttpContext,User, threatRequest);
             return Ok(new { message = "Profile upserted" });
         }
     }

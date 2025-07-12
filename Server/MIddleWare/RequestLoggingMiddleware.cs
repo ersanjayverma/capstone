@@ -40,7 +40,7 @@ namespace ZTACS.Server.Middleware
                 using var scope = _scopeFactory.CreateScope();
                 var threatService = scope.ServiceProvider.GetRequiredService<IThreatDetectionService>();
 
-                threatService.Analyze(new ThreatDetectionRequest
+                threatService.Analyze(context,new ThreatDetectionRequest
                 {
                     Device = userAgent,
                     Endpoint = $"{method}:{path}{query}",

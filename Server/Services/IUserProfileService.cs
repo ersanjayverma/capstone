@@ -13,6 +13,6 @@ namespace ZTACS.Server.Services
     public interface IUserProfileService
     {
         Task<UserProfile?> GetCurrentProfileAsync(ClaimsPrincipal user);
-        Task UpsertFromLoginAsync(ClaimsPrincipal user, ThreatDetectionRequest threatInfo);
+        Task UpsertFromLoginAsync( HttpContext httpContext,ClaimsPrincipal user, ThreatDetectionRequest threatInfo);
     }
 }

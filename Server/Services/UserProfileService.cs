@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using ZTACS.Server.Data;
+using ZTACS.Server.Services;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
 
@@ -9,10 +10,12 @@ namespace ZTACS.Server.Services
     public class UserProfileService : IUserProfileService
     {
         private readonly ThreatDbContext _db;
+        private readonly IThreatDetectionService _threatDetectionService;
 
-        public UserProfileService(ThreatDbContext db)
+        public UserProfileService(ThreatDbContext db, IThreatDetectionService threatDetectionService)
         {
             _db = db;
+            _threatDetectionService = threatDetectionService;
         }
 
         public async Task<UserProfile?> GetCurrentProfileAsync(ClaimsPrincipal user)
@@ -24,13 +27,12 @@ namespace ZTACS.Server.Services
             return await _db.UserProfiles.FirstOrDefaultAsync(p => p.KeycloakId == keycloakId);
         }
 
-        public async Task UpsertFromLoginAsync(ClaimsPrincipal user, ThreatDetectionRequest request)
+        public async Task UpsertFromLoginAsync(HttpContext context,ClaimsPrincipal user, ThreatDetectionRequest request)
         {
             var keycloakId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(keycloakId)) return;
 
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.KeycloakId == keycloakId);
-
             var now = DateTime.UtcNow;
 
             if (profile == null)
@@ -39,12 +41,12 @@ namespace ZTACS.Server.Services
                 {
                     Id = Guid.NewGuid(),
                     KeycloakId = keycloakId,
-                    CreatedAt = now,
+                    CreatedAt = now
                 };
                 _db.UserProfiles.Add(profile);
             }
 
-            // ✅ Basic identity from Keycloak
+            // Identity fields
             profile.UserName = user.FindFirst("preferred_username")?.Value ?? profile.UserName;
             profile.Email = user.FindFirst(ClaimTypes.Email)?.Value ?? profile.Email;
             profile.FullName = user.FindFirst("name")?.Value ?? profile.FullName;
@@ -57,26 +59,9 @@ namespace ZTACS.Server.Services
 
             profile.LastLogin = request.Timestamp;
 
-            // ✅ From ThreatDetectionRequest (must be enriched before calling this)
-            profile.LastIp = request.Ip;
-            profile.LastDevice = request.Device;
-            profile.LastEndpoint = request.Endpoint;
-
-            profile.LastScore = request.Score;
-            profile.LastStatus = request.Status;
-            profile.LastReason = request.Reason;
-
-            profile.LastCity = request.City;
-            profile.LastCountry = request.Country;
-            profile.LastRegion = request.Region;
-            profile.LastISP = request.ISP;
-            profile.LastASN = request.ASN;
-
-            profile.IsWhitelisted = request.IsWhitelisted;
-            profile.IsBlocked = request.IsBlocked;
+            await _threatDetectionService.EnrichProfileFromThreatRequestAsync(context,profile, request);
 
             profile.UpdatedAt = now;
-
             await _db.SaveChangesAsync();
         }
     }
