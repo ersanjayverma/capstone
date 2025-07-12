@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection; // Add this line
 using Microsoft.Extensions.Http;
 using MudBlazor;
+using ZTACS.Client.Services;
 using MudBlazor.Services;
 using System.Net.Http;
 using ZTACS.Client;
@@ -34,6 +35,6 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.ResponseType = "code";
     options.ProviderOptions.DefaultScopes.Add("offline_access");
 });
-
+builder.Services.AddScoped<FingerprintService>();
 
 await builder.Build().RunAsync();

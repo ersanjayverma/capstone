@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inject HttpClient Http
 @inject NavigationManager Nav
+@inject FingerprintService FingerprintService
 @inject AuthenticationStateProvider AuthStateProvider
 <AuthorizeView>
     <Authorized>
@@ -54,7 +55,7 @@ var threatRequest = new ThreatDetectionRequest
     UserId = userId,
     Ip = await GetClientIpAsync(), // assumes a JSInterop or API helper
     Endpoint = Nav.Uri,
-    Device = "BlazorWASM",
+    Device = await FingerprintService.GetFingerprintAsync(),
     Timestamp = DateTime.UtcNow,
     Score = 0f,
     Status = "Safe",
