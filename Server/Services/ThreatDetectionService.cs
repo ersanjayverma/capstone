@@ -145,7 +145,7 @@ namespace ZTACS.Server.Services
             if (!user.Identity?.IsAuthenticated ?? true)
                 return new LogResponse();
 
-            //var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             //if (!isAdmin && !string.IsNullOrEmpty(userId))
             //{

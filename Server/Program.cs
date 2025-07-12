@@ -130,7 +130,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication(); // ✅ Needed for JWT auth
-app.UseAuthorization(); // ✅ This line is MISSING and required!
+app.UseAuthorization(); 
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.MapRazorPages();

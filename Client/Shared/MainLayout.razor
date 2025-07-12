@@ -1,25 +1,50 @@
 ﻿@using MudBlazor
+@using System.Security.Claims
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 
-<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="@theme"/>
-<MudPopoverProvider/>
-<MudDialogProvider/> <!-- 🔥 THIS IS REQUIRED -->
-<MudSnackbarProvider/>
-<MudLayout>
-    <AuthorizeView>
-        <Authorized Context="main">
-            <!-- 🔷 Drawer -->
-            <MudDrawer Open="@State" Elevation="1" Variant="DrawerVariant.Mini" Class="drawer-content">
-                <!-- 🔷 ZTACS Logo at Top -->
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
+<MudLayout Class="mud-layout">
+
+    <MudAppBar Elevation="2" Color="Color.Primary">
+        @if (IsAuthenticated)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleState" />
+        }
+
+        <MudText Typo="Typo.h6" Class="ml-2">ZTACS</MudText>
+
+        <MudSpacer />
+
+        @if (IsAuthenticated)
+        {
+            <MudText Class="mr-2">@UserName</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/logout" StartIcon="@Icons.Material.Filled.Logout">
+                Logout
+            </MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Href="/login" StartIcon="@Icons.Material.Filled.Login">
+                Login
+            </MudButton>
+        }
+    </MudAppBar>
+
+    <AuthorizeView>
+        <Authorized Context="authContext">
+            <MudDrawer Open="@State" Elevation="1" Variant="DrawerVariant.Mini" Class="drawer-content">
                 <div class="d-flex justify-center mb-4">
-                    <a href="#" title="ZTACS by BHB" @onclick="ToggleState" class="ztacs-logo-link">
+                    <a title="ZTACS by BHB" @onclick="ToggleState" class="ztacs-logo-link">
                         @if (State)
                         {
-                            <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;"/>
+                            <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;" />
                         }
                         else
                         {
@@ -27,103 +52,115 @@
                                  viewBox="0 0 100 100"
                                  height="48"
                                  class="ztacs-logo-svg">
-                                <path d="@GetShieldPath()" fill="@GetColor()"/>
-
-                                <!-- Optional label -->
+                                <path d="@GetShieldPath()" fill="@GetColor()" />
                                 <text x="50%" y="60%" text-anchor="middle" fill="#fff"
                                       font-size="18" font-family="Arial" dy=".3em">
-                                    @("ZTACS")
+                                    ZTACS
                                 </text>
-
                             </svg>
                         }
                     </a>
                 </div>
 
                 <style>
-                        .ztacs-logo-link {
-                            transition: transform 0.2s ease;
-                        }
+                    .ztacs-logo-link {
+                        transition: transform 0.2s ease;
+                    }
 
-                        .ztacs-logo-link:hover {
-                            transform: scale(1.1);
-                        }
+                    .ztacs-logo-link:hover {
+                        transform: scale(1.1);
+                    }
 
-                        .ztacs-logo-svg {
-                            transition: fill 0.3s ease;
-                        }
-                    </style>
-                <!-- Navigation Menu -->
+                    .ztacs-logo-svg {
+                        transition: fill 0.3s ease;
+                    }
+                </style>
+
                 <MudNavMenu>
                     <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-                    <MudNavLink Href="/threat-detection" Icon="@Icons.Material.Filled.Dangerous">Threat Detection</MudNavLink>
+                     <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.Report">
+                            <MudNavLink Href="/threat-logs" Icon="@Icons.Material.Filled.People">Threat Logs</MudNavLink>
+                        </MudNavGroup>
                     <MudNavLink Href="/profile" Icon="@Icons.Material.Filled.Person">Profile</MudNavLink>
-                    <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.AdminPanelSettings">Admin</MudNavLink>
-                    <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.Report">
-                        <MudNavLink Href="/admin/threat-logs" Icon="@Icons.Material.Filled.People">Threat-logs</MudNavLink>
-                    </MudNavGroup>
 
-                    <MudSpacer/>
-                    <AuthorizeView>
-                        <Authorized Context="access">
-                            <!-- 🔒 Logout at Bottom -->
-                            <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout" Class="mt-auto">Logout</MudNavLink>
-                        </Authorized>
-
-                    </AuthorizeView>
+                    @if (IsAdmin(authContext.User))
+                    {
+                        <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.AdminPanelSettings">Admin</MudNavLink>
+                       
+                    }
                 </MudNavMenu>
             </MudDrawer>
-            <!-- 🟩 Main Content -->
-            <MudMainContent Class="p-4">
 
+            <MudMainContent Class="p-4 mud-main-content">
                 @Body
             </MudMainContent>
         </Authorized>
+
         <NotAuthorized>
-            <MudDrawer Open="true" Elevation="1" Variant="DrawerVariant.Mini" Class="drawer-content">
-                <!-- 🔷 ZTACS Logo at Top -->
-                <div class="d-flex justify-center mb-4">
-                    <a href="/dashboard" title="ZTACS Home">
-                        <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;"/>
-                    </a>
-                </div>
-
-                <!-- Navigation Menu -->
-                <MudNavMenu>
-                    <!-- 🔒 Login at Bottom -->
-                    <MudNavLink Href="/login" Icon="@Icons.Material.Filled.Login" Class="mt-auto">Login</MudNavLink>
-                </MudNavMenu>
-            </MudDrawer>
-            <!-- 🟩 Main Content -->
-            <MudMainContent Class="p-4">
+            <!-- No Drawer for unauthenticated users -->
+            <MudMainContent Class="p-4 mud-main-content">
                 @Body
-
             </MudMainContent>
         </NotAuthorized>
     </AuthorizeView>
-
 </MudLayout>
-
 
 @code {
     private bool _isDarkMode = true;
-    private MudTheme? theme = new();
     public bool State = false;
+    private string UserName = "";
+    private bool IsAuthenticated = false;
 
-
-    private void ToggleState()
+    private readonly MudTheme theme = new()
     {
-        State = !State;
-    }
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#4caf50",
+            Secondary = "#03dac6",
+            Background = "#121212",
+            Surface = "#1e1e1e",
+            DrawerBackground = "#1b1b1b",
+            DrawerText = "#ffffff",
+            DrawerIcon = "#4caf50",
+            AppbarBackground = "#1e1e1e",
+            AppbarText = "#ffffff",
+            TextPrimary = "#ffffff",
+            TextSecondary = "#b0b0b0",
+            ActionDefault = "#90caf9",
+            Success = "#4caf50",
+            Warning = "#ffb300",
+            Error = "#f44336",
+            Info = "#29b6f6"
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = "6px"
+        }
+    };
 
-    private string GetShieldPath()
+    private void ToggleState() => State = !State;
+
+    private string GetShieldPath() =>
+        "M50 5L90 25v30c0 30-25 40-40 40S10 85 10 55V25L50 5z";
+
+    private string GetColor() => "#4caf50";
+
+private bool IsAdmin(ClaimsPrincipal user) =>
+    user.IsInRole("Admin") || user.Claims.Any(c =>
+        (string.Equals(c.Type, ClaimTypes.Role, StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(c.Type, "roles", StringComparison.OrdinalIgnoreCase))
+        && string.Equals(c.Value, "Admin", StringComparison.OrdinalIgnoreCase));
+
+
+    protected override async Task OnInitializedAsync()
     {
-        return "M50 5L90 25v30c0 30-25 40-40 40S10 85 10 55V25L50 5z";
-    }
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        IsAuthenticated = user.Identity?.IsAuthenticated == true;
 
-    private string GetColor()
-    {
-        return "#4caf50";
+        if (IsAuthenticated)
+        {
+            UserName = user.Identity?.Name ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "User";
+        }
     }
-
 }

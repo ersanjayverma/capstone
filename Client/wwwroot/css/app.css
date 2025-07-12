@@ -1,51 +1,73 @@
-﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-.mud-main-content {
-    position: relative;
-    background-color: #121212 !important;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Prevent any overflow outside */
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent outer scrollbars */
 }
 
-    .mud-main-content > .content-scrollable {
-        flex: 1 1 auto;
-        overflow-y: auto;
-        overflow-x: hidden;
-        min-height: 0; /* required for flex child scroll */
-    }
+.mud-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh; /* Ensure it stretches full screen */
+    overflow: hidden;
+}
 
+/* AppBar stays at top */
+.mud-appbar {
+    z-index: 2;
+}
 
-    .mud-main-content::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        opacity: 0.1; /* More visible now */
-        background-image: url("data:image/svg+xml;utf8,\
+/* This lets main content grow & scroll */
+.mud-main-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    padding: 16px;
+    z-index: 1;
+    background-color: #2b2b33 !important;
+}
+
+/* 🔧 Animated Background — toned down */
+.mud-main-content::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    opacity: 0.08; /* Lower opacity for readability */
+    background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'>\
-<rect width='100' height='100' fill='none'/>\
-<g stroke='%2300ffaa' stroke-width='1'>\
-<path d='M0 0 L100 100 M100 0 L0 100'/>\
-<circle cx='50' cy='50' r='2' fill='%2300ffaa'/>\
-<rect x='20' y='20' width='3' height='3' fill='%2300ffaa'/>\
-<rect x='75' y='75' width='3' height='3' fill='%2300ffaa'/>\
-</g>\
-</svg>");
-        background-size: 150px 150px;
-        background-repeat: repeat;
-        animation: circuitScroll 60s linear infinite;
-    }
+<g stroke='%234caf50' stroke-width='1'>\
+<path d='M0 0 L100 100 M100 0 L0 100'/><circle cx='50' cy='50' r='3' fill='%234caf50'/>\
+<rect x='20' y='20' width='4' height='4' fill='%234caf50'/><rect x='75' y='75' width='4' height='4' fill='%234caf50'/>\
+</g></svg>");
+    background-size: 150px 150px;
+    background-repeat: repeat;
+    animation: circuitScroll 60s linear infinite;
+}
 
 @keyframes circuitScroll {
-    0% {
-        background-position: 0 0;
-    }
+    0% { background-position: 0 0; }
+    100% { background-position: 0 1000px; }
+}
 
-    100% {
-        background-position: 0 1000px;
-    }
+/* Optional: Nice scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #4caf50;
+    border-radius: 4px;
+}
+.mud-main-content {
+    position: relative;
+    background-color: #2b2b33 !important;
+    color: rgb(6, 248, 87);
+    padding: 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 1;
+    min-height: calc(100dvh - 64px); /* Ensures at least screen height */
+    height: auto; /* ✅ Shrink to fit */
 }

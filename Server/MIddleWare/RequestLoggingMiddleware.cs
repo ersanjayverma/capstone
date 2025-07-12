@@ -19,23 +19,27 @@ namespace ZTACS.Server.Middleware
         {
             var request = context.Request;
 
-            var ip = context.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+            // Extract IP from X-Forwarded-For or fallback
+            string ip = context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor)
+                ? forwardedFor.FirstOrDefault()?.Split(',').First().Trim() ?? "127.0.0.1"
+                : context.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+
             var method = request.Method;
             var path = request.Path;
             var query = request.QueryString.HasValue ? request.QueryString.Value : string.Empty;
             var userAgent = request.Headers["User-Agent"].ToString();
 
+            // Let the pipeline run so authentication completes first
+            await _next(context);
+
             var user = context.User?.Identity?.IsAuthenticated == true
-                ? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                  ?? "Unknown"
+                ? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Unknown"
                 : "Anonymous";
-            if (user != "Anonymous")
-            {
-                // Scoped service
+
+         
                 using var scope = _scopeFactory.CreateScope();
                 var threatService = scope.ServiceProvider.GetRequiredService<IThreatDetectionService>();
 
-                // Await async call
                 threatService.Analyze(new ThreatDetectionRequest
                 {
                     Device = userAgent,
@@ -45,8 +49,6 @@ namespace ZTACS.Server.Middleware
                     Timestamp = DateTime.UtcNow
                 });
             }
-
-            await _next(context);
-        }
+        
     }
 }
