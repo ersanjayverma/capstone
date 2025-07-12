@@ -1,10 +1,13 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ZTACS.Shared.Entities
 {
     public class LogEventDetail : Base
     {
-        public Guid Id { get; set; }
+        [ForeignKey("LoginEvent")]
+        public Guid LoginEventId { get; set; }
+        public LoginEvent? LoginEvent { get; set; }
         public string UserId { get; set; } = string.Empty;
         public string IP { get; set; } = string.Empty;
         public string Device { get; set; } = string.Empty;
@@ -14,15 +17,28 @@ namespace ZTACS.Shared.Entities
         public string Reason { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; }
 
-        // 🆕 Additional Enrichment
+        // 🌍 Enrichment
         public string Country { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
+        public string Region { get; set; } = string.Empty;
         public string ISP { get; set; } = string.Empty;
-        public string UserAgent { get; set; } = string.Empty;
-        public string[] RequestHeaders { get; set; } = [];
         public string ASN { get; set; } = string.Empty;
 
-        // Convenience flags
+        public string UserAgent { get; set; } = string.Empty;
+
+        // For EF Core 6+: use string serialization for arrays
+        public string? RequestHeadersJson { get; set; }
+
+        [NotMapped]
+        public string[] RequestHeaders
+        {
+            get => string.IsNullOrWhiteSpace(RequestHeadersJson)
+                ? Array.Empty<string>()
+                : System.Text.Json.JsonSerializer.Deserialize<string[]>(RequestHeadersJson) ?? Array.Empty<string>();
+            set => RequestHeadersJson = System.Text.Json.JsonSerializer.Serialize(value);
+        }
+
+        // Flags
         public bool IsWhitelisted { get; set; }
         public bool IsBlocked { get; set; }
     }

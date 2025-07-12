@@ -23,117 +23,102 @@ namespace ZTACS.Server.Services
                 .ToHashSet();
         }
 
-        public ThreatDetectionResponse Analyze(ThreatDetectionRequest request)
+public ThreatDetectionResponse Analyze(ThreatDetectionRequest request)
+{
+    var riskScore = 0;
+    var reasons = new List<string>();
+    var nowUtc = DateTime.UtcNow;
+
+    if (string.IsNullOrWhiteSpace(request.UserId) || request.UserId == "anonymous")
+    {
+        riskScore += 25;
+        reasons.Add("Anonymous user");
+    }
+
+    if (_blacklistedIps.Contains(request.Ip))
+    {
+        riskScore += 80;
+        reasons.Add("Blacklisted IP");
+    }
+
+    if (request.Endpoint.Contains("/admin", StringComparison.OrdinalIgnoreCase))
+    {
+        riskScore += 20;
+        reasons.Add("Accessed admin endpoint");
+    }
+
+    var hour = request.Timestamp.ToUniversalTime().Hour;
+    if (hour < 6 || hour > 22)
+    {
+        riskScore += 10;
+        reasons.Add("Unusual access hour");
+    }
+
+    var lastLogins = _db.LoginEvents
+        .Where(e => e.UserId == request.UserId)
+        .OrderByDescending(e => e.Timestamp)
+        .Take(20)
+        .ToList();
+
+    if (!lastLogins.Any())
+    {
+        riskScore += 15;
+        reasons.Add("First login detected");
+    }
+    else
+    {
+        if (!lastLogins.Any(e => e.Ip == request.Ip))
         {
-            var riskScore = 0;
-            var reasons = new List<string>();
-            var nowUtc = DateTime.UtcNow;
-
-            // Rule 0: Anonymous user
-            if (string.IsNullOrWhiteSpace(request.UserId) || request.UserId == "anonymous")
-            {
-                riskScore += 25;
-                reasons.Add("Anonymous user");
-            }
-
-            // Rule 1: Static IP blacklist
-            if (_blacklistedIps.Contains(request.Ip))
-            {
-                riskScore += 80;
-                reasons.Add("Blacklisted IP");
-            }
-
-            // Rule 2: Sensitive endpoint
-            if (request.Endpoint.Contains("/admin", StringComparison.OrdinalIgnoreCase))
-            {
-                riskScore += 20;
-                reasons.Add("Accessed admin endpoint");
-            }
-
-            // Rule 3: Unusual hours
-            var hour = request.Timestamp.ToUniversalTime().Hour;
-            if (hour < 6 || hour > 22)
-            {
-                riskScore += 10;
-                reasons.Add("Unusual access hour");
-            }
-
-            // Rule 4: Analyze login history
-            var lastLogins = _db.LoginEvents
-                .Where(e => e.UserId == request.UserId)
-                .OrderByDescending(e => e.Timestamp)
-                .Take(20)
-                .ToList();
-
-            if (!lastLogins.Any())
-            {
-                riskScore += 15;
-                reasons.Add("First login detected");
-            }
-            else
-            {
-                var recentIps = lastLogins.Select(e => e.Ip).Distinct().ToList();
-                if (!recentIps.Contains(request.Ip))
-                {
-                    riskScore += 20;
-                    reasons.Add("New IP address");
-                }
-
-                var recentDevices = lastLogins.Select(e => e.Device).Distinct().ToList();
-                if (!recentDevices.Contains(request.Device))
-                {
-                    riskScore += 15;
-                    reasons.Add("New device used");
-                }
-
-                var rapidLogins = lastLogins.Count(e => e.Timestamp > request.Timestamp.AddMinutes(-5));
-                if (rapidLogins > 5)
-                {
-                    riskScore += 25;
-                    reasons.Add("High-frequency login attempts");
-                }
-
-                var veryRecent = lastLogins.FirstOrDefault(e =>
-                    e.Endpoint == request.Endpoint &&
-                    e.Ip == request.Ip &&
-                    e.Device == request.Device &&
-                    (request.Timestamp - e.Timestamp).TotalSeconds < 10);
-
-                if (veryRecent != null)
-                {
-                    riskScore += 20;
-                    reasons.Add("Repeated request too soon");
-                }
-            }
-
-            var finalStatus = riskScore switch
-            {
-                >= 75 => "blocked",
-                >= 40 => "suspicious",
-                _ => "clean"
-            };
-
-            _db.LoginEvents.Add(new LoginEvent
-            {
-                UserId = request.UserId,
-                Ip = request.Ip,
-                Device = request.Device,
-                Endpoint = request.Endpoint,
-                Timestamp = request.Timestamp,
-                Score = riskScore,
-                Status = finalStatus,
-                Reason = string.Join("; ", reasons)
-            });
-
-            _db.SaveChanges();
-
-            return new ThreatDetectionResponse
-            {
-                RiskScore = riskScore,
-                Status = finalStatus,
-                Reason = string.Join("; ", reasons)
-            };
+            riskScore += 20;
+            reasons.Add("New IP address");
         }
+
+        if (!lastLogins.Any(e => e.Device == request.Device))
+        {
+            riskScore += 15;
+            reasons.Add("New device used");
+        }
+
+        if (lastLogins.Count(e => e.Timestamp > request.Timestamp.AddMinutes(-5)) > 5)
+        {
+            riskScore += 25;
+            reasons.Add("High-frequency login attempts");
+        }
+    }
+
+    var finalStatus = riskScore switch
+    {
+        >= 75 => "blocked",
+        >= 40 => "suspicious",
+        _ => "clean"
+    };
+
+    var logEvent = new LoginEvent
+    {
+        Id = Guid.NewGuid(),
+        UserId = request.UserId,
+        Ip = request.Ip,
+        Device = request.Device,
+        Endpoint = request.Endpoint,
+        Timestamp = request.Timestamp,
+        Score = riskScore,
+        Status = finalStatus,
+        Reason = string.Join("; ", reasons)
+    };
+
+    _db.LoginEvents.Add(logEvent);
+    _db.SaveChanges(); // 💾 Save before detail
+
+    return new ThreatDetectionResponse
+    {
+        RiskScore = riskScore,
+        Status = finalStatus,
+        Reason = string.Join("; ", reasons),
+        LoginEventId = logEvent.Id
+    };
+}
+
+
 
         public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null,
             int page = 1, int pageSize = 50)

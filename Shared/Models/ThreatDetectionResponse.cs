@@ -5,5 +5,6 @@
         public int RiskScore { get; set; } // 0 to 100
         public string Status { get; set; } // clean | suspicious | blocked
         public string Reason { get; set; }
+        public Guid? LoginEventId { get; set; }
     }
 }

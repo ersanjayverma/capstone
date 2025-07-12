@@ -23,6 +23,16 @@ namespace ZTACS.Shared.Models
         [Required] public string Device { get; set; }
         [Required] public string Endpoint { get; set; }
         [Required] public DateTime Timestamp { get; set; }
+public float Score { get; set; }
+public string Status { get; set; } = "";
+public string Reason { get; set; } = "";
+public string City { get; set; } = "";
+public string Country { get; set; } = "";
+public string Region { get; set; } = "";
+public string ISP { get; set; } = "";
+public string ASN { get; set; } = "";
+public bool IsWhitelisted { get; set; }
+public bool IsBlocked { get; set; }
 
         private static bool IsValidIp(string ip)
         {

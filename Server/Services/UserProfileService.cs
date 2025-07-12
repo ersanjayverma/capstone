@@ -1,7 +1,6 @@
 using System.Security.Claims;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using ZTACS.Server.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
 
@@ -18,53 +17,65 @@ namespace ZTACS.Server.Services
 
         public async Task<UserProfile?> GetCurrentProfileAsync(ClaimsPrincipal user)
         {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return await _db.UserProfiles.AsNoTracking()
-                .FirstOrDefaultAsync(p => p.UserId == userId);
+            var keycloakId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(keycloakId))
+                return null;
+
+            return await _db.UserProfiles.FirstOrDefaultAsync(p => p.KeycloakId == keycloakId);
         }
 
-        public async Task UpsertFromLoginAsync(ClaimsPrincipal user, ThreatDetectionRequest threatInfo)
+        public async Task UpsertFromLoginAsync(ClaimsPrincipal user, ThreatDetectionRequest request)
         {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId)) return;
+            var keycloakId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(keycloakId)) return;
 
-            var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.KeycloakId == keycloakId);
+
             var now = DateTime.UtcNow;
 
-            if (profile is null)
+            if (profile == null)
             {
                 profile = new UserProfile
                 {
-                    UserId = userId,
-                    CreatedAt = now
+                    Id = Guid.NewGuid(),
+                    KeycloakId = keycloakId,
+                    CreatedAt = now,
                 };
                 _db.UserProfiles.Add(profile);
             }
 
-            profile.UserName = user.Identity?.Name ?? "User";
-            profile.Email = user.FindFirst(ClaimTypes.Email)?.Value ?? "";
-            profile.FullName = user.FindFirst("name")?.Value;
-            profile.FirstName = user.FindFirst("given_name")?.Value;
-            profile.LastName = user.FindFirst("family_name")?.Value;
-            profile.Locale = user.FindFirst("locale")?.Value;
-            profile.Roles = string.Join(',', user.FindAll(ClaimTypes.Role).Select(r => r.Value));
+            // ✅ Basic identity from Keycloak
+            profile.UserName = user.FindFirst("preferred_username")?.Value ?? profile.UserName;
+            profile.Email = user.FindFirst(ClaimTypes.Email)?.Value ?? profile.Email;
+            profile.FullName = user.FindFirst("name")?.Value ?? profile.FullName;
+            profile.FirstName = user.FindFirst("given_name")?.Value ?? profile.FirstName;
+            profile.LastName = user.FindFirst("family_name")?.Value ?? profile.LastName;
+            profile.Locale = user.FindFirst("locale")?.Value ?? profile.Locale;
 
-            profile.LastLogin = now;
+            var roles = user.FindAll(ClaimTypes.Role).Select(r => r.Value);
+            profile.Roles = string.Join(",", roles);
+
+            profile.LastLogin = request.Timestamp;
+
+            // ✅ From ThreatDetectionRequest (must be enriched before calling this)
+            profile.LastIp = request.Ip;
+            profile.LastDevice = request.Device;
+            profile.LastEndpoint = request.Endpoint;
+
+            profile.LastScore = request.Score;
+            profile.LastStatus = request.Status;
+            profile.LastReason = request.Reason;
+
+            profile.LastCity = request.City;
+            profile.LastCountry = request.Country;
+            profile.LastRegion = request.Region;
+            profile.LastISP = request.ISP;
+            profile.LastASN = request.ASN;
+
+            profile.IsWhitelisted = request.IsWhitelisted;
+            profile.IsBlocked = request.IsBlocked;
+
             profile.UpdatedAt = now;
-
-            profile.LastLoginIp = threatInfo.Ip;
-            profile.LastLoginDevice = threatInfo.Device;
-            profile.LastLoginEndpoint = threatInfo.Endpoint;
-            profile.LastLoginScore = threatInfo.Score;
-            profile.LastLoginStatus = threatInfo.Status;
-            profile.LastLoginReason = threatInfo.Reason;
-            profile.LastLoginCity = threatInfo.City;
-            profile.LastLoginCountry = threatInfo.Country;
-            profile.LastLoginRegion = threatInfo.Region;
-            profile.LastLoginISP = threatInfo.ISP;
-            profile.LastLoginASN = threatInfo.ASN;
-            profile.IsWhitelisted = threatInfo.IsWhitelisted;
-            profile.IsBlocked = threatInfo.IsBlocked;
 
             await _db.SaveChangesAsync();
         }

@@ -1,17 +1,18 @@
+using System;
 using System.ComponentModel.DataAnnotations;
-using ZTACS.Shared.Entities;
 
 namespace ZTACS.Shared.Entities
 {
     public class UserProfile : Base
     {
+        // === 🧑 Identity Information ===
         [Required]
-        public string UserId { get; set; } = ""; // From Keycloak 'sub'
+        public string KeycloakId { get; set; } = string.Empty; // From Keycloak sub/subject claim
 
         [Required]
-        public string UserName { get; set; } = ""; // From 'preferred_username'
+        public string UserName { get; set; } = string.Empty; // From 'preferred_username'
 
-        public string Email { get; set; } = "";
+        public string Email { get; set; } = string.Empty;
 
         public string? FullName { get; set; }
 
@@ -21,35 +22,35 @@ namespace ZTACS.Shared.Entities
 
         public string? Locale { get; set; }
 
-        public string? Roles { get; set; } // comma-separated
+        public string? Roles { get; set; } // Comma-separated roles (e.g., "Admin,User")
 
-        public byte[]? ProfileImage { get; set; } // passport-sized image
+        public byte[]? ProfileImage { get; set; } // Passport-sized image blob (base64 stored as byte[])
 
         public DateTime LastLogin { get; set; } = DateTime.UtcNow;
 
         // === 🛡️ Threat Intelligence Metadata ===
 
-        public string? LastLoginIp { get; set; }
+        public string? LastIp { get; set; }
 
-        public string? LastLoginCity { get; set; }
+        public string? LastCity { get; set; }
 
-        public string? LastLoginCountry { get; set; }
+        public string? LastCountry { get; set; }
 
-        public string? LastLoginRegion { get; set; }
+        public string? LastRegion { get; set; }
 
-        public string? LastLoginISP { get; set; }
+        public string? LastISP { get; set; }
 
-        public string? LastLoginASN { get; set; }
+        public string? LastASN { get; set; }
 
-        public string? LastLoginDevice { get; set; }
+        public string? LastDevice { get; set; }
 
-        public string? LastLoginEndpoint { get; set; }
+        public string? LastEndpoint { get; set; }
 
-        public float? LastLoginScore { get; set; }
+        public float? LastScore { get; set; }
 
-        public string? LastLoginStatus { get; set; }
+        public string? LastStatus { get; set; }
 
-        public string? LastLoginReason { get; set; }
+        public string? LastReason { get; set; }
 
         public bool IsWhitelisted { get; set; }
 
