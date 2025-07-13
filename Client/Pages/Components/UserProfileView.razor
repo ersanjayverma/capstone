@@ -94,6 +94,15 @@ else
    private async Task OpenEditDialog()
 {
     var parameters = new DialogParameters { ["User"] = User };
-    var dialog = DialogService.Show<EditUserProfileDialog>("Edit Profile", parameters);
+   var dialog = DialogService.Show<EditUserProfileDialog>("Edit Profile", parameters);
+
+var result = await dialog.Result;
+if (!result.Canceled && result.Data is UserProfile)
+{
+    User = (UserProfile)result.Data;
+
+    // Optionally refresh UI or fetch again from backend
+    StateHasChanged();
+}
     }
 }

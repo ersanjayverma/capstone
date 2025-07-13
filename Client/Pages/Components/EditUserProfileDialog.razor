@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @inject ISnackbar Snackbar
 @inject IJSRuntime JS
-
+@inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
         <MudText Typo="Typo.h6" Class="mb-4">Edit Profile</MudText>
@@ -39,7 +39,7 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] public MudBlazor.IDialogReference  MudDialog { get; set; } = default!;
+    [CascadingParameter] public IMudDialogInstance  MudDialog { get; set; } = default!;
     [Parameter] public UserProfile User { get; set; } = default!;
 
     private MudForm _form = default!;
@@ -71,13 +71,9 @@
             PreviewImage =User.ProfileImage;
     }
 
-    private void Cancel()
+    private async Task Cancel()
     {
-        try{
-        MudDialog?.Close();
-        }catch(Exception ex){
-             Console.WriteLine("Caught exception:", ex); // preferred
-        }
+       MudDialog?.Cancel();
     }
 
     private async Task Save()
@@ -96,7 +92,7 @@
             if (response.IsSuccessStatusCode)
             {
                 Snackbar.Add("Profile updated successfully.", Severity.Success);
-                MudDialog?.Close();
+               MudDialog.Close(DialogResult.Ok(EditableUser));
             }
             else
             {
@@ -129,6 +125,9 @@
  var imageBytes = ms.ToArray();
         EditableUser.ProfileImage = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
         PreviewImage = PreviewImage;
+
+        
+
     }
     catch (Exception ex)
     {

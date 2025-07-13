@@ -1,4 +1,5 @@
-﻿<MudDialog>
+﻿@inject IDialogService DialogService
+<MudDialog >
     <DialogContent>
         @if (Detail is null)
         {
@@ -36,12 +37,13 @@
     </DialogContent>
 
     <DialogActions>
-        <MudButton OnClick="() => MudDialog?.Close()">Close</MudButton>
+        <MudButton OnClick="@(() => MudDialog?.Cancel())">Close</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudBlazor.IDialogReference MudDialog { get; set; }
+    private bool _isVisible = true;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     [Parameter] public LogEventDetail Detail { get; set; }
 }
