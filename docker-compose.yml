@@ -1,0 +1,15 @@
+services:
+  ztacsserver:
+    image: vermasj/ztacsserver
+    container_name: ztacsserver
+    ports:
+      - "8083:8080"
+      - "8084:8081"
+    restart: unless-stopped
+    networks:
+      - data_ztacs
+
+networks:
+  data_ztacs:
+    external: true
+

@@ -10,9 +10,12 @@ using System.Text;
 
 namespace ZTACS.Server.Services
 {
-    public interface IUserProfileService
-    {
-        Task<UserProfile?> GetCurrentProfileAsync(ClaimsPrincipal user);
-        Task UpsertFromLoginAsync( HttpContext httpContext,ClaimsPrincipal user, ThreatDetectionRequest threatInfo);
-    }
+public interface IUserProfileService
+{
+    Task<UserProfile?> GetCurrentProfileAsync(ClaimsPrincipal user);
+    Task<UserProfile?> GetByUserIdAsync(string userId);
+    Task SaveAsync(UserProfile profile);
+    Task UpsertFromLoginAsync(HttpContext context, ClaimsPrincipal user, ThreatDetectionRequest request);
+}
+
 }

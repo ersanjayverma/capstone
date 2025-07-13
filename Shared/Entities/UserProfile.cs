@@ -9,7 +9,7 @@ namespace ZTACS.Shared.Entities
         [Required]
         public string KeycloakId { get; set; } = string.Empty; // From Keycloak sub/subject claim
 
-        [Required]
+       
         public string UserName { get; set; } = string.Empty; // From 'preferred_username'
 
         public string Email { get; set; } = string.Empty;
@@ -24,7 +24,7 @@ namespace ZTACS.Shared.Entities
 
         public string? Roles { get; set; } // Comma-separated roles (e.g., "Admin,User")
 
-        public byte[]? ProfileImage { get; set; } // Passport-sized image blob (base64 stored as byte[])
+        public string? ProfileImage { get; set; } // Passport-sized image blob (base64 stored as byte[])
 
         public DateTime LastLogin { get; set; } = DateTime.UtcNow;
 

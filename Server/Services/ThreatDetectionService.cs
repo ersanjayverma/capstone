@@ -187,7 +187,7 @@ namespace ZTACS.Server.Services
                 query = query.Where(e => e.Ip.Contains(ip));
 
             if (!string.IsNullOrWhiteSpace(status))
-                query = query.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(e => e.Status.ToLower().Equals(status.ToLower()));
 
             var total = await query.CountAsync();
 

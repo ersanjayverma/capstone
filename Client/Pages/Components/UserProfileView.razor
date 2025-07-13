@@ -1,6 +1,9 @@
 @using ZTACS.Shared.Entities
 @using System.Text
 @using MudBlazor
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject HttpClient Http
 
 @if (User is null)
 {
@@ -9,13 +12,20 @@
 else
 {
     <MudPaper Class="pa-6 mx-auto mt-6" Elevation="4" Style="max-width: 900px;">
+        <MudStack Row Justify="Justify.FlexEnd" Class="mb-2">
+            <MudButton StartIcon="@Icons.Material.Filled.Edit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="@OpenEditDialog">
+                Edit Profile
+            </MudButton>
+        </MudStack>
+
         <MudGrid>
             <!-- Avatar & Basic Info -->
             <MudItem xs="12" sm="4" Class="text-center">
-                <MudAvatar Size="Size.Large"
-                           Image="@ProfileImageUrl"
-                           Class="my-4"
-                           Alt="Profile Image" />
+                 <img src="@User.ProfileImage" alt="Profile Image"
+         style="max-width: 128px; max-height: 128px; border-radius: 50%;" />
                 <MudText Typo="Typo.h6">@User.UserName</MudText>
                 <MudText Typo="Typo.subtitle2" Color="Color.Secondary">@User.Email</MudText>
 
@@ -78,6 +88,12 @@ else
 
     private string? ProfileImageUrl =>
         User.ProfileImage != null
-            ? $"data:image/png;base64,{Convert.ToBase64String(User.ProfileImage)}"
+            ? User.ProfileImage
             : "https://via.placeholder.com/150";
+
+   private async Task OpenEditDialog()
+{
+    var parameters = new DialogParameters { ["User"] = User };
+    var dialog = DialogService.Show<EditUserProfileDialog>("Edit Profile", parameters);
+    }
 }

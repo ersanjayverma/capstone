@@ -1,0 +1,140 @@
+@using MudBlazor
+@using ZTACS.Shared.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject IJSRuntime JS
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6" Class="mb-4">Edit Profile</MudText>
+
+        <MudForm @ref="_form" Model="@EditableUser">
+            <!-- Read-only User ID -->
+            <MudTextField Label="User ID" Value="@EditableUser.Id.ToString()" Disabled="true" />
+
+            <!-- Editable Fields -->
+            <MudTextField @bind-Value="EditableUser.FullName" Label="Full Name" Required="true" />
+            <MudTextField @bind-Value="EditableUser.FirstName" Label="First Name" />
+            <MudTextField @bind-Value="EditableUser.LastName" Label="Last Name" />
+            <MudTextField @bind-Value="EditableUser.Locale" Label="Locale" />
+
+            @if (EnableImageUpload)
+            {
+                <MudText Typo="Typo.subtitle2" Class="mt-4">Upload Profile Picture</MudText>
+                <InputFile OnChange="@HandleImageUpload" />
+                @if (!string.IsNullOrEmpty(PreviewImage))
+                {
+                   <img src="@PreviewImage" alt="Profile Image"
+         style="max-width: 128px; max-height: 128px; border-radius: 50%;" />
+                }
+            }
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public MudBlazor.IDialogReference  MudDialog { get; set; } = default!;
+    [Parameter] public UserProfile User { get; set; } = default!;
+
+    private MudForm _form = default!;
+    private UserProfile EditableUser = new();
+    private bool EnableImageUpload = true;
+    private string? PreviewImage;
+
+    protected override void OnInitialized()
+    {
+        if (User == null)
+        {
+            Snackbar?.Add("User parameter was not provided.", Severity.Error);
+            MudDialog?.Close();
+            return;
+        }
+
+        EditableUser = new UserProfile
+        {
+            Id = User.Id,
+            KeycloakId = User.KeycloakId,
+            FullName = User.FullName,
+            FirstName = User.FirstName,
+            LastName = User.LastName,
+            Locale = User.Locale,
+            ProfileImage = User.ProfileImage
+        };
+
+        if (User.ProfileImage is { Length: > 0 })
+            PreviewImage =User.ProfileImage;
+    }
+
+    private void Cancel()
+    {
+        try{
+        MudDialog?.Close();
+        }catch(Exception ex){
+             Console.WriteLine("Caught exception:", ex); // preferred
+        }
+    }
+
+    private async Task Save()
+    {
+        await _form.Validate();
+
+        if (!_form.IsValid || EditableUser is null)
+        {
+            Snackbar.Add("Form is invalid or user data is missing.", Severity.Error);
+            return;
+        }
+
+        try
+        {
+            var response = await Http.PutAsJsonAsync("api/profile", EditableUser);
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Profile updated successfully.", Severity.Success);
+                MudDialog?.Close();
+            }
+            else
+            {
+                Snackbar.Add("Failed to update profile.", Severity.Error);
+            }
+        }
+        catch
+        {
+            Snackbar.Add("Server error while updating profile.", Severity.Error);
+        }
+    }
+
+   private async Task HandleImageUpload(InputFileChangeEventArgs e)
+{
+    var file = e.File;
+    if (file is null)
+    {
+        Snackbar.Add("Invalid file upload.", Severity.Warning);
+        return;
+    }
+
+    try
+    {
+        // Resize image to fit within 256x256 pixels, keep aspect ratio
+        var resizedFile = await file.RequestImageFileAsync("image/png", 256, 256);
+
+        using var stream = resizedFile.OpenReadStream(maxAllowedSize: 1024 * 1024); // 1 MB
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+ var imageBytes = ms.ToArray();
+        EditableUser.ProfileImage = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+        PreviewImage = PreviewImage;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Image resize failed: {ex.Message}");
+        Snackbar.Add("Image resize failed. Upload a valid image.", Severity.Error);
+    }
+}
+
+}
