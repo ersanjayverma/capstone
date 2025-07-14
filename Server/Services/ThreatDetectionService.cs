@@ -6,6 +6,7 @@ using ZTACS.Server.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
 using System.Text;
+using ApexCharts;
 
 namespace ZTACS.Server.Services
 {
@@ -264,18 +265,53 @@ namespace ZTACS.Server.Services
 
         public async Task<string> ExportLogsToCsv()
         {
-            var logs = await _db.LoginEvents.ToListAsync();
+            var logs = await _db.LogEventDetails.ToListAsync();
             var csv = new StringBuilder();
-            csv.AppendLine("Id,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp");
+
+            // Header
+            csv.AppendLine("LoginEventId,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp,Country,City,Region,ISP,ASN,UserAgent,IsWhitelisted,IsBlocked");
 
             foreach (var log in logs)
             {
-                csv.AppendLine(
-                    $"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
+                csv.AppendLine(string.Join(",",
+                    Escape(log.LoginEventId.ToString()),
+                    Escape(log.UserId),
+                    Escape(log.IP),
+                    Escape(log.Device),
+                    Escape(log.Endpoint),
+                    log.Score?.ToString() ?? "",
+                    Escape(log.Status),
+                    Escape(log.Reason),
+                    Escape(((long)(log.Timestamp.ToUnixTimeMilliseconds()/1000)).ToString()),
+                    Escape(log.Country),
+                    Escape(log.City),
+                    Escape(log.Region),
+                    Escape(log.ISP),
+                    Escape(log.ASN),
+                    Escape(log.UserAgent),
+                    log.IsWhitelisted.ToString(),
+                    log.IsBlocked.ToString()
+                ));
             }
 
             return csv.ToString();
         }
+
+        // 🔐 Escapes commas, quotes, and newlines for CSV-safe output
+        private static string Escape(string? field)
+        {
+            if (string.IsNullOrWhiteSpace(field))
+                return "";
+
+            if (field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
+            {
+                // Double all quotes, wrap in quotes
+                return $"\"{field.Replace("\"", "\"\"")}\"";
+            }
+
+            return field;
+        }
+
 
         public async Task BlockIp(BlockIpRequest request)
         {
