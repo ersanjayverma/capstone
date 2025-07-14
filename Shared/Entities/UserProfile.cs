@@ -6,10 +6,9 @@ namespace ZTACS.Shared.Entities
     public class UserProfile : Base
     {
         // === 🧑 Identity Information ===
-        [Required]
-        public string KeycloakId { get; set; } = string.Empty; // From Keycloak sub/subject claim
+        [Required] public string KeycloakId { get; set; } = string.Empty; // From Keycloak sub/subject claim
 
-       
+
         public string UserName { get; set; } = string.Empty; // From 'preferred_username'
 
         public string Email { get; set; } = string.Empty;

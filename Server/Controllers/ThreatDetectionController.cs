@@ -21,7 +21,7 @@ namespace ZTACS.Server.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = threatDetectionService.Analyze(HttpContext,request);
+            var result = threatDetectionService.Analyze(HttpContext, request);
 
             logger.LogInformation("Threat analysis for User {UserId}: Risk {RiskScore}, Status {Status}",
                 request.UserId, result.RiskScore, result.Status);

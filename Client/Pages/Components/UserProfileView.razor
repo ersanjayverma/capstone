@@ -24,8 +24,8 @@ else
         <MudGrid>
             <!-- Avatar & Basic Info -->
             <MudItem xs="12" sm="4" Class="text-center">
-                 <img src="@User.ProfileImage" alt="Profile Image"
-         style="max-width: 128px; max-height: 128px; border-radius: 50%;" />
+                <img src="@User.ProfileImage" alt="Profile Image"
+                     style="max-width: 128px; max-height: 128px; border-radius: 50%;"/>
                 <MudText Typo="Typo.h6">@User.UserName</MudText>
                 <MudText Typo="Typo.subtitle2" Color="Color.Secondary">@User.Email</MudText>
 
@@ -41,30 +41,62 @@ else
             <MudItem xs="12" sm="8">
                 <MudText Typo="Typo.h6" Class="mb-2">Identity Info</MudText>
                 <MudList T="object" Dense="true">
-                    <MudListItem T="object"><b>Full Name:</b> @User.FullName</MudListItem>
-                    <MudListItem T="object"><b>First Name:</b> @User.FirstName</MudListItem>
-                    <MudListItem T="object"><b>Last Name:</b> @User.LastName</MudListItem>
-                    <MudListItem T="object"><b>Locale:</b> @User.Locale</MudListItem>
-                    <MudListItem T="object"><b>Last Login:</b> @User.LastLogin.ToLocalTime().ToString("f")</MudListItem>
+                    <MudListItem T="object">
+                        <b>Full Name:</b> @User.FullName
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>First Name:</b> @User.FirstName
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Last Name:</b> @User.LastName
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Locale:</b> @User.Locale
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Last Login:</b> @User.LastLogin.ToLocalTime().ToString("f")
+                    </MudListItem>
                 </MudList>
             </MudItem>
 
             <!-- Threat Metadata -->
             <MudItem xs="12">
-                <MudDivider Class="my-4" />
+                <MudDivider Class="my-4"/>
                 <MudText Typo="Typo.h6" Class="mb-2">Threat Intelligence</MudText>
                 <MudList T="object" Dense="true">
-                    <MudListItem T="object"><b>IP Address:</b> @User.LastIp</MudListItem>
-                    <MudListItem T="object"><b>City:</b> @User.LastCity</MudListItem>
-                    <MudListItem T="object"><b>Region:</b> @User.LastRegion</MudListItem>
-                    <MudListItem T="object"><b>Country:</b> @User.LastCountry</MudListItem>
-                    <MudListItem T="object"><b>ISP:</b> @User.LastISP</MudListItem>
-                    <MudListItem T="object"><b>ASN:</b> @User.LastASN</MudListItem>
-                    <MudListItem T="object"><b>Device:</b> @User.LastDevice</MudListItem>
-                    <MudListItem T="object"><b>Endpoint:</b> @User.LastEndpoint</MudListItem>
-                    <MudListItem T="object"><b>Status:</b> @User.LastStatus</MudListItem>
-                    <MudListItem T="object"><b>Threat Score:</b> @(User.LastScore?.ToString("F2") ?? "N/A")</MudListItem>
-                    <MudListItem T="object"><b>Reason:</b> @User.LastReason</MudListItem>
+                    <MudListItem T="object">
+                        <b>IP Address:</b> @User.LastIp
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>City:</b> @User.LastCity
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Region:</b> @User.LastRegion
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Country:</b> @User.LastCountry
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>ISP:</b> @User.LastISP
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>ASN:</b> @User.LastASN
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Device:</b> @User.LastDevice
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Endpoint:</b> @User.LastEndpoint
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Status:</b> @User.LastStatus
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Threat Score:</b> @(User.LastScore?.ToString("F2") ?? "N/A")
+                    </MudListItem>
+                    <MudListItem T="object">
+                        <b>Reason:</b> @User.LastReason
+                    </MudListItem>
                 </MudList>
 
                 <MudStack Row Spacing="1" Class="mt-2">
@@ -83,26 +115,26 @@ else
 }
 
 @code {
-    [Parameter]
-    public UserProfile User { get; set; }
+    [Parameter] public UserProfile User { get; set; }
 
     private string? ProfileImageUrl =>
         User.ProfileImage != null
             ? User.ProfileImage
             : "https://via.placeholder.com/150";
 
-   private async Task OpenEditDialog()
-{
-    var parameters = new DialogParameters { ["User"] = User };
-   var dialog = DialogService.Show<EditUserProfileDialog>("Edit Profile", parameters);
+    private async Task OpenEditDialog()
+    {
+        var parameters = new DialogParameters { ["User"] = User };
+        var dialog = DialogService.Show<EditUserProfileDialog>("Edit Profile", parameters);
 
-var result = await dialog.Result;
-if (!result.Canceled && result.Data is UserProfile)
-{
-    User = (UserProfile)result.Data;
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data is UserProfile)
+        {
+            User = (UserProfile)result.Data;
 
-    // Optionally refresh UI or fetch again from backend
-    StateHasChanged();
-}
+            // Optionally refresh UI or fetch again from backend
+            StateHasChanged();
+        }
     }
+
 }

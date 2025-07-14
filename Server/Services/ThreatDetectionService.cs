@@ -23,7 +23,7 @@ namespace ZTACS.Server.Services
                 .ToHashSet();
         }
 
-        public ThreatDetectionResponse Analyze(HttpContext context,ThreatDetectionRequest request)
+        public ThreatDetectionResponse Analyze(HttpContext context, ThreatDetectionRequest request)
         {
             request.Ip = ExtractClientIp(context);
             var riskScore = 0;
@@ -118,29 +118,30 @@ namespace ZTACS.Server.Services
             };
         }
 
-    public async Task EnrichProfileFromThreatRequestAsync(HttpContext context,UserProfile profile, ThreatDetectionRequest request)
-{
-    request.Ip = ExtractClientIp(context);
-    profile.LastIp = request.Ip;
-    profile.LastDevice = request.Device;
-    profile.LastEndpoint = request.Endpoint;
-    profile.LastScore = request.Score;
-    profile.LastStatus = request.Status;
-    profile.LastReason = request.Reason;
-   
+        public async Task EnrichProfileFromThreatRequestAsync(HttpContext context, UserProfile profile,
+            ThreatDetectionRequest request)
+        {
+            request.Ip = ExtractClientIp(context);
+            profile.LastIp = request.Ip;
+            profile.LastDevice = request.Device;
+            profile.LastEndpoint = request.Endpoint;
+            profile.LastScore = request.Score;
+            profile.LastStatus = request.Status;
+            profile.LastReason = request.Reason;
 
-    // Always enrich
-    var (country, city, isp, asn) = await EnrichIpAsync(request.Ip);
 
-    profile.LastCity = city ?? "";
-    profile.LastCountry = country ?? "";
-    profile.LastISP = isp ?? "";
-    profile.LastASN = asn ?? "";
-    profile.LastRegion = request.Region ?? "";
+            // Always enrich
+            var (country, city, isp, asn) = await EnrichIpAsync(request.Ip);
 
-    profile.IsWhitelisted = request.IsWhitelisted;
-    profile.IsBlocked = request.IsBlocked;
-}
+            profile.LastCity = city ?? "";
+            profile.LastCountry = country ?? "";
+            profile.LastISP = isp ?? "";
+            profile.LastASN = asn ?? "";
+            profile.LastRegion = request.Region ?? "";
+
+            profile.IsWhitelisted = request.IsWhitelisted;
+            profile.IsBlocked = request.IsBlocked;
+        }
 
 
         public async Task<(string? Country, string? City, string? ISP, string? ASN)> EnrichIpAsync(string ip)
@@ -262,7 +263,8 @@ namespace ZTACS.Server.Services
 
             foreach (var log in logs)
             {
-                csv.AppendLine($"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
+                csv.AppendLine(
+                    $"{log.Id},{log.UserId},{log.Ip},{log.Device},{log.Endpoint},{log.Score},{log.Status},{log.Reason},{log.Timestamp:O}");
             }
 
             return csv.ToString();
@@ -304,6 +306,7 @@ namespace ZTACS.Server.Services
                 .Select(w => w.Ip)
                 .ToListAsync();
         }
+
         public string ExtractClientIp(HttpContext context)
         {
             if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))

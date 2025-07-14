@@ -7,32 +7,57 @@
         }
         else
         {
-<MudPaper Class="pa-3">
-    <MudGrid>
-        <!-- Left Column -->
-        <MudItem xs="12" sm="6">
-            <MudText><b>User ID:</b> @Detail.UserId</MudText>
-            <MudText><b>IP:</b> @Detail.IP</MudText>
-            <MudText><b>Device:</b> @Detail.Device</MudText>
-            <MudText><b>Endpoint:</b> @Detail.Endpoint</MudText>
-            <MudText><b>User Agent:</b> @Detail.Device</MudText> <!-- Consider renaming this in model -->
-            <MudText><b>Timestamp:</b> @Detail.Timestamp.ToString("g")</MudText>
-            <MudText><b>Status:</b> @Detail.Status</MudText>
-            <MudText><b>Reason:</b> @Detail.Reason</MudText>
-            <MudText><b>Score:</b> @Detail.Score</MudText>
-        </MudItem>
+            <MudPaper Class="pa-3">
+                <MudGrid>
+                    <!-- Left Column -->
+                    <MudItem xs="12" sm="6">
+                        <MudText>
+                            <b>User ID:</b> @Detail.UserId
+                        </MudText>
+                        <MudText>
+                            <b>IP:</b> @Detail.IP
+                        </MudText>
+                        <MudText>
+                            <b>Device:</b> @Detail.Device
+                        </MudText>
+                        <MudText>
+                            <b>Endpoint:</b> @Detail.Endpoint
+                        </MudText>
+                        <MudText>
+                            <b>User Agent:</b> @Detail.Device
+                        </MudText> <!-- Consider renaming this in model -->
+                        <MudText>
+                            <b>Timestamp:</b> @Detail.Timestamp.ToString("g")
+                        </MudText>
+                        <MudText>
+                            <b>Status:</b> @Detail.Status
+                        </MudText>
+                        <MudText>
+                            <b>Reason:</b> @Detail.Reason
+                        </MudText>
+                        <MudText>
+                            <b>Score:</b> @Detail.Score
+                        </MudText>
+                    </MudItem>
 
-        <!-- Right Column -->
-        <MudItem xs="12" sm="6">
-            <MudText><b>Location:</b> @Detail.City, @Detail.Country</MudText>
-            <MudText><b>ISP:</b> @Detail.ISP</MudText>
-            <MudText><b>ASN:</b> @Detail.ASN</MudText>
-            <MudText><b>Whitelisted:</b> @(Detail.IsWhitelisted ? "Yes" : "No")</MudText>
-            <MudText><b>Blocked:</b> @(Detail.IsBlocked ? "Yes" : "No")</MudText>
-        </MudItem>
-    </MudGrid>
-</MudPaper>
-
+                    <!-- Right Column -->
+                    <MudItem xs="12" sm="6">
+                        <MudText><b>Location:</b> @Detail.City, @Detail.Country</MudText>
+                        <MudText>
+                            <b>ISP:</b> @Detail.ISP
+                        </MudText>
+                        <MudText>
+                            <b>ASN:</b> @Detail.ASN
+                        </MudText>
+                        <MudText>
+                            <b>Whitelisted:</b> @(Detail.IsWhitelisted ? "Yes" : "No")
+                        </MudText>
+                        <MudText>
+                            <b>Blocked:</b> @(Detail.IsBlocked ? "Yes" : "No")
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
         }
     </DialogContent>
 

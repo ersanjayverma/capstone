@@ -5,8 +5,7 @@ namespace ZTACS.Shared.Entities
 {
     public class LogEventDetail : Base
     {
-        [ForeignKey("LoginEvent")]
-        public Guid LoginEventId { get; set; }
+        [ForeignKey("LoginEvent")] public Guid LoginEventId { get; set; }
         public LoginEvent? LoginEvent { get; set; }
         public string UserId { get; set; } = string.Empty;
         public string IP { get; set; } = string.Empty;

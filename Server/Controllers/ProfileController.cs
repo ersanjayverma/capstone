@@ -49,7 +49,7 @@ namespace ZTACS.Server.Controllers
             existing.FullName = updatedProfile.FullName;
             existing.FirstName = updatedProfile.FirstName;
             existing.LastName = updatedProfile.LastName;
-            existing.ProfileImage= updatedProfile.ProfileImage;
+            existing.ProfileImage = updatedProfile.ProfileImage;
             existing.Locale = updatedProfile.Locale;
 
             await _profileService.SaveAsync(existing);

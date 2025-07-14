@@ -5,22 +5,22 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 
-<MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="theme" />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="theme"/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 
 <MudLayout Class="mud-layout">
 
     <MudAppBar Elevation="2" Color="Color.Primary">
         @if (IsAuthenticated)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleState" />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleState"/>
         }
 
         <MudText Typo="Typo.h6" Class="ml-2">ZTACS</MudText>
 
-        <MudSpacer />
+        <MudSpacer/>
 
         @if (IsAuthenticated)
         {
@@ -44,7 +44,7 @@
                     <a title="ZTACS by BHB" @onclick="ToggleState" class="ztacs-logo-link">
                         @if (State)
                         {
-                            <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;" />
+                            <img src="images/ztacs-logo.svg" alt="ZTACS Logo" style="height:48px;"/>
                         }
                         else
                         {
@@ -52,7 +52,7 @@
                                  viewBox="0 0 100 100"
                                  height="48"
                                  class="ztacs-logo-svg">
-                                <path d="@GetShieldPath()" fill="@GetColor()" />
+                                <path d="@GetShieldPath()" fill="@GetColor()"/>
                                 <text x="50%" y="60%" text-anchor="middle" fill="#fff"
                                       font-size="18" font-family="Arial" dy=".3em">
                                     ZTACS
@@ -78,15 +78,14 @@
 
                 <MudNavMenu>
                     <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-                     <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.Report">
-                            <MudNavLink Href="/threat-logs" Icon="@Icons.Material.Filled.People">Threat Logs</MudNavLink>
-                        </MudNavGroup>
+                    <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.Report">
+                        <MudNavLink Href="/threat-logs" Icon="@Icons.Material.Filled.People">Threat Logs</MudNavLink>
+                    </MudNavGroup>
                     <MudNavLink Href="/profile" Icon="@Icons.Material.Filled.Person">Profile</MudNavLink>
 
                     @if (IsAdmin(authContext.User))
                     {
                         <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.AdminPanelSettings">Admin</MudNavLink>
-                       
                     }
                 </MudNavMenu>
             </MudDrawer>
@@ -145,11 +144,11 @@
 
     private string GetColor() => "#4caf50";
 
-private bool IsAdmin(ClaimsPrincipal user) =>
-    user.IsInRole("Admin") || user.Claims.Any(c =>
-        (string.Equals(c.Type, ClaimTypes.Role, StringComparison.OrdinalIgnoreCase) ||
-         string.Equals(c.Type, "roles", StringComparison.OrdinalIgnoreCase))
-        && string.Equals(c.Value, "Admin", StringComparison.OrdinalIgnoreCase));
+    private bool IsAdmin(ClaimsPrincipal user) =>
+        user.IsInRole("Admin") || user.Claims.Any(c =>
+            (string.Equals(c.Type, ClaimTypes.Role, StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(c.Type, "roles", StringComparison.OrdinalIgnoreCase))
+            && string.Equals(c.Value, "Admin", StringComparison.OrdinalIgnoreCase));
 
 
     protected override async Task OnInitializedAsync()
@@ -163,4 +162,5 @@ private bool IsAdmin(ClaimsPrincipal user) =>
             UserName = user.Identity?.Name ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "User";
         }
     }
+
 }

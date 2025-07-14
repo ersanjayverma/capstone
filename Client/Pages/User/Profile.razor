@@ -9,7 +9,7 @@
         @if (isLoading)
         {
             <MudPaper Class="pa-6 mx-auto mt-10 text-center" Elevation="0">
-                <MudProgressCircular Indeterminate="true" Size="Size.Large" />
+                <MudProgressCircular Indeterminate="true" Size="Size.Large"/>
                 <MudText Typo="Typo.subtitle1" Class="mt-2">Loading your profile...</MudText>
             </MudPaper>
         }
@@ -21,12 +21,12 @@
         }
         else
         {
-            <UserProfileView User="@UserProfileModel" />
+            <UserProfileView User="@UserProfileModel"/>
         }
     </Authorized>
     <NotAuthorized>
         <MudPaper Elevation="4" Class="pa-6 mx-auto mt-12 text-center" Style="max-width: 500px;">
-            <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Warning" Size="Size.Large" />
+            <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Warning" Size="Size.Large"/>
             <MudText Typo="Typo.h6" Class="mt-2">Access Denied</MudText>
             <MudText Typo="Typo.subtitle2">You must be logged in to view this page.</MudText>
             <MudButton Color="Color.Primary" Class="mt-4" OnClick="@(() => Nav.NavigateTo("auth/login", true))">
@@ -46,32 +46,32 @@
         {
             isLoading = true;
 
-          var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-var userId = user?.FindFirst("sub")?.Value ?? "";  // Keycloak `sub` claim
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var userId = user?.FindFirst("sub")?.Value ?? ""; // Keycloak `sub` claim
 
-var threatRequest = new ThreatDetectionRequest
-{
-    UserId = userId,
-    Ip = await GetClientIpAsync(), // assumes a JSInterop or API helper
-    Endpoint = Nav.Uri,
-    Device = await FingerprintService.GetFingerprintAsync(),
-    Timestamp = DateTime.UtcNow,
-    Score = 0f,
-    Status = "Safe",
-    Reason = "Normal access",
+            var threatRequest = new ThreatDetectionRequest
+            {
+                UserId = userId,
+                Ip = await GetClientIpAsync(), // assumes a JSInterop or API helper
+                Endpoint = Nav.Uri,
+                Device = await FingerprintService.GetFingerprintAsync(),
+                Timestamp = DateTime.UtcNow,
+                Score = 0f,
+                Status = "Safe",
+                Reason = "Normal access",
 
-    // Geo/IP metadata (can be filled from previous enrichment or left empty for server to fill)
-    City = "",
-    Country = "",
-    Region = "",
-    ISP = "",
-    ASN = "",
+                // Geo/IP metadata (can be filled from previous enrichment or left empty for server to fill)
+                City = "",
+                Country = "",
+                Region = "",
+                ISP = "",
+                ASN = "",
 
-    // Trust flags (can be defaulted)
-    IsWhitelisted = false,
-    IsBlocked = false
-};
+                // Trust flags (can be defaulted)
+                IsWhitelisted = false,
+                IsBlocked = false
+            };
 
 
             // Step 2: Upsert
@@ -96,4 +96,5 @@ var threatRequest = new ThreatDetectionRequest
         // Implement X-Forwarded-For or any other IP source if you're behind a proxy
         return "127.0.0.1"; // replace with real IP logic if needed
     }
+
 }

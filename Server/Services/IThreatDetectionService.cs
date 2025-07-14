@@ -7,7 +7,7 @@ namespace ZTACS.Server.Services
 {
     public interface IThreatDetectionService
     {
-        ThreatDetectionResponse Analyze( HttpContext httpContext,ThreatDetectionRequest request);
+        ThreatDetectionResponse Analyze(HttpContext httpContext, ThreatDetectionRequest request);
 
         Task<LogResponse> GetLogs(
             HttpContext httpContext,
@@ -20,7 +20,9 @@ namespace ZTACS.Server.Services
         Task<LogEventDetail?> GetLogDetailAsync(Guid id);
 
         Task<List<LoginEvent>> GetAllLogs();
-        Task EnrichProfileFromThreatRequestAsync( HttpContext httpContext,UserProfile profile, ThreatDetectionRequest request);
+
+        Task EnrichProfileFromThreatRequestAsync(HttpContext httpContext, UserProfile profile,
+            ThreatDetectionRequest request);
 
 
         Task<string> ExportLogsToCsv();

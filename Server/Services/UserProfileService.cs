@@ -38,7 +38,8 @@ namespace ZTACS.Server.Services
             await _db.SaveChangesAsync();
         }
 
-        public async Task UpsertFromLoginAsync(HttpContext context, ClaimsPrincipal user, ThreatDetectionRequest request)
+        public async Task UpsertFromLoginAsync(HttpContext context, ClaimsPrincipal user,
+            ThreatDetectionRequest request)
         {
             var keycloakId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(keycloakId)) return;
