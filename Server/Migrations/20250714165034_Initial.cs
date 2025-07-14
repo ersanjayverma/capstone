@@ -83,7 +83,8 @@ namespace ZTACS.Server.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Roles = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProfileImage = table.Column<byte[]>(type: "longblob", nullable: true),
+                    ProfileImage = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     LastLogin = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastIp = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),

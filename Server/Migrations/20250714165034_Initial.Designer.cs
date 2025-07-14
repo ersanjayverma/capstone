@@ -12,7 +12,7 @@ using ZTACS.Server.Data;
 namespace ZTACS.Server.Migrations
 {
     [DbContext(typeof(ThreatDbContext))]
-    [Migration("20250712030941_Initial")]
+    [Migration("20250714165034_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -273,8 +273,8 @@ namespace ZTACS.Server.Migrations
                     b.Property<string>("Locale")
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("ProfileImage")
-                        .HasColumnType("longblob");
+                    b.Property<string>("ProfileImage")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Roles")
                         .HasColumnType("longtext");

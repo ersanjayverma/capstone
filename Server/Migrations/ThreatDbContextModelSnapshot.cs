@@ -270,8 +270,8 @@ namespace ZTACS.Server.Migrations
                     b.Property<string>("Locale")
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("ProfileImage")
-                        .HasColumnType("longblob");
+                    b.Property<string>("ProfileImage")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Roles")
                         .HasColumnType("longtext");

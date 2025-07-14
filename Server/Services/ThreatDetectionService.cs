@@ -105,9 +105,16 @@ namespace ZTACS.Server.Services
                 Status = finalStatus,
                 Reason = string.Join("; ", reasons)
             };
+            
 
             _db.LoginEvents.Add(logEvent);
             _db.SaveChanges();
+            var details = GetLogDetailAsync(logEvent.Id).GetAwaiter().GetResult();
+            if (details is not null)
+            {
+                _db.LogEventDetails.Add(details);
+                _db.SaveChanges();
+            }
 
             return new ThreatDetectionResponse
             {
