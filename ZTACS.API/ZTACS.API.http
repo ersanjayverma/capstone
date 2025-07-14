@@ -1,0 +1,6 @@
+@ZTACS.API_HostAddress = http://localhost:5032
+
+GET {{ZTACS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

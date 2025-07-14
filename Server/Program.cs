@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Main Services
 builder.Services.AddScoped<IThreatDetectionService, ThreatDetectionService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-
+builder.Services.AddHttpClient();
 builder.Services.AddDbContext<ThreatDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
