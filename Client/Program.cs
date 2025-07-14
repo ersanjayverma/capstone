@@ -34,6 +34,8 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("email");
     options.ProviderOptions.ResponseType = "code";
     options.ProviderOptions.DefaultScopes.Add("offline_access");
+     options.ProviderOptions.DefaultScopes.Add("roles");
+    options.ProviderOptions.DefaultScopes.Add("ztacs-server"); // API audience
 });
 builder.Services.AddScoped<FingerprintService>();
 
