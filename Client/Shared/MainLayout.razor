@@ -5,7 +5,7 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 
-<MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="theme"/>
+<MudThemeProvider @bind-IsDarkMode="@(true)" Theme="theme"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
@@ -105,7 +105,6 @@
 </MudLayout>
 
 @code {
-    private bool _isDarkMode = true;
     public bool State = false;
     private string UserName = "";
     private bool IsAuthenticated = false;
@@ -159,7 +158,7 @@
 
         if (IsAuthenticated)
         {
-            UserName = user.Identity?.Name ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "User";
+            UserName = user.Identity?.Name ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "Wow We missed your name.";
         }
     }
 
