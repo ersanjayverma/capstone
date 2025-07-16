@@ -71,3 +71,8 @@
     min-height: calc(100dvh - 64px); /* Ensures at least screen height */
     height: auto; /* ✅ Shrink to fit */
 }
+#threatChart {
+    height: 40vh;
+    width: 80vw;
+    border: 1px solid #ccc;
+}
