@@ -3,7 +3,7 @@ namespace ZTACS.Shared.Models
     public class ChartPoint
     {
         public string Label { get; set; } = string.Empty;
-        public decimal? Value { get; set; }
+        public double Value { get; set; }
         public string? Color { get; set; } // Optional: for customized coloring per point
         public DateTime Timestamp { get; set; }
         // Optional: for tooltips or extended info
@@ -17,9 +17,10 @@ namespace ZTACS.Shared.Models
         {
         }
 
-        public ChartPoint(string label, decimal value, string? color = null, string? tooltip = null,
+        public ChartPoint(string label, double value, DateTime TimeStamp,string? color = null, string? tooltip = null,
             string? category = null)
         {
+            Timestamp= TimeStamp;
             Label = label;
             Value = value;
             Color = color;

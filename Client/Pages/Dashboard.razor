@@ -1,10 +1,8 @@
 ﻿@page "/dashboard"
 @inject HttpClient Http
-@using ApexCharts
-@using ApexColor = ApexCharts.Color
-@using MudColor = MudBlazor.Color
-@inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
+@using MudBlazor
+@using ZTACS.Shared.Entities
 
 <AuthorizeView>
     <Authorized>
@@ -42,7 +40,7 @@
             </MudItem>
         </MudGrid>
 
-        <MudDivider Class="my-1" />
+        <MudDivider Class="my-4" />
 
         @if (ChartData.Any())
         {
@@ -50,22 +48,17 @@
                 <MudStack Spacing="2">
                     <MudText Typo="Typo.h6">📊 Threat Level Chart</MudText>
 
-            
+                    <MudSelect T="int" Label="Chart Type" Value="@selectedType" ValueChanged="@UpdateChartType" Dense Class="w-48">
+                        @foreach (var entry in ChartTypes)
+                        {
+                            <MudSelectItem Value="@entry.Key">@entry.Value</MudSelectItem>
+                        }
+                    </MudSelect>
 
-                    <div class="content-scrollable" style="max-height: 500px; overflow-y: auto;">
-                        <ApexChart TItem="ChartPoint"
-                                   Title="Threats Over Time"
-                                   Height="350"
-                                   >
-                            <ApexPointSeries TItem="ChartPoint"
-                                             Items="@ChartData"
-                                             Name="Threat Level"
-                                             SeriesType="@SeriesTypes[@selectedType]"
-                                             XValue="@( (ChartPoint p) => p.Timestamp )"
-                                             YValue="@( (ChartPoint p) => p.Value )"
-                                      />
-                        </ApexChart>
-                    </div>
+                    <div style="width:100%; height:400px; position: relative;">
+    <canvas @ref="CanvasRef" id="threatChart" width="1080" height="400"></canvas>
+</div>
+
                 </MudStack>
             </MudPaper>
         }
@@ -79,9 +72,11 @@
     </Authorized>
 
     <NotAuthorized>
-        <MudPaper Class="pa-6 mx-auto mt-10" MaxWidth="500px" Style="background-color:#1e1e2f; color: #f5f5f5;">
+        <MudPaper Class="pa-6 mx-auto mt-10"
+                  MaxWidth="500px"
+                  Style="background-color:#1e1e2f; color: #f5f5f5;">
             <MudText Typo="Typo.h6">🚫 You are not authorized</MudText>
-            <MudButton Href="/login" Variant="Variant.Filled" Color="MudColor.Primary" Class="mt-4">Login</MudButton>
+            <MudButton Href="/login" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4">Login</MudButton>
         </MudPaper>
     </NotAuthorized>
 </AuthorizeView>
@@ -89,44 +84,116 @@
 @code {
     private LogResponse? Stats;
     private List<ChartPoint> ChartData = new();
-    private int selectedType = 1;
+    private int selectedType = 0;
+    private object? ChartJsConfig;
+    private ElementReference CanvasRef;
+    private bool _chartRendered;
 
-    private Dictionary<int, SeriesType> SeriesTypes = new()
+    private readonly Dictionary<int, string> ChartTypes = new()
     {
-        { 0, SeriesType.Line },
-        { 1, SeriesType.Area },
-        { 2, SeriesType.Bar },
-        { 3, SeriesType.Scatter },
-        { 4, SeriesType.Heatmap },
-        { 5, SeriesType.Radar },
+        { 0, "bar" },
+        { 1, "line" },
+        { 2, "pie" },
+        { 3, "doughnut" },
+        { 4, "scatter" },
+        { 5, "radar" },
+        { 6, "polarArea" }
     };
 
-    protected override async Task OnInitializedAsync() => await LoadStats();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStats();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (ChartJsConfig != null && !_chartRendered)
+        {
+            await JS.InvokeVoidAsync("renderChartFromElement", CanvasRef, ChartJsConfig);
+            _chartRendered = true;
+        }
+    }
 
     private async Task LoadStats()
     {
-        Stats = await Http.GetFromJsonAsync<LogResponse>("api/ThreatDetection/logs?ip=&status=&page=0&pageSize=100000");
+        Stats = await Http.GetFromJsonAsync<LogResponse>(
+            "api/ThreatDetection/logs?ip=&status=&page=0&pageSize=100000");
 
-        if (Stats is not null)
+        if (Stats != null)
         {
-            ChartData = Stats.Logs.Select(e => new ChartPoint
-            {
-                Label = e.Status,
-                Value = e.Score ?? 0,
-                Timestamp = e.Timestamp,
-                Color = e.Status switch
-                {
-                    "blocked" => "#FF4C4C",
-                    "suspicious" => "#4CAF50",
-                    "clean" => "#FFD700",
-                    _ => "#B0BEC5"
-                }
-            }).ToList();
-        }
+            ChartData = Stats.Logs
+                .Select(e => new ChartPoint(e.Status, (double)(e.Score ?? 0), e.Timestamp))
+                .ToList();
 
-        await InvokeAsync(StateHasChanged);
+            PrepareChartConfig();
+            _chartRendered = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
-    private void Update(){
-        InvokeAsync(StateHasChanged);
+
+    private void PrepareChartConfig()
+    {
+        var type = ChartTypes[selectedType];
+
+        if (type is "pie" or "doughnut" or "polarArea" or "radar")
+        {
+            var grouped = ChartData
+                .GroupBy(p => p.Label)
+                .Select(g => new
+                {
+                    Label = g.Key,
+                    Value = g.Sum(p => p.Value)
+                }).ToList();
+
+            ChartJsConfig = new
+            {
+                type,
+                data = new
+                {
+                    labels = grouped.Select(g => g.Label).ToArray(),
+                    datasets = new[]
+                    {
+                        new
+                        {
+                            label = "Threat Summary",
+                            data = grouped.Select(g => g.Value).ToArray(),
+                            backgroundColor = new[] { "#ef5350", "#ffa726", "#66bb6a", "#42a5f5", "#ab47bc" }
+                        }
+                    }
+                },
+                options = new { responsive = true }
+            };
+        }
+        else
+        {
+            ChartJsConfig = new
+            {
+                type,
+                data = new
+                {
+                    labels = ChartData.Select(p => p.Timestamp.TimeOfDay).ToArray(),
+                    datasets = new[]
+                    {
+                        new
+                        {
+                            label = "Threat Score",
+                            data = ChartData.Select(p => p.Value).ToArray(),
+                            backgroundColor = "#1e88e5",
+                            borderColor = "#0d47a1",
+                            fill = false
+                        }
+                    }
+                },
+                options = new { responsive = true }
+            };
+        }
+    }
+
+    private async Task UpdateChartType(int value)
+    {
+        selectedType = value;
+        PrepareChartConfig();
+        _chartRendered = false;
+        await InvokeAsync(StateHasChanged);
     }
 }

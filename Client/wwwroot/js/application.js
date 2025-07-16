@@ -5,32 +5,27 @@ window.getFingerprint = async () => {
     const result = await fp.get();
     return result.visitorId;
 };
+ window.renderChartFromElement = (canvasElement, config) => {
+        if (!window.myCharts) window.myCharts = {};
 
-  window.resizeImage = async function (file, maxWidth, maxHeight) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const img = new Image();
-        img.onload = function () {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
+        if (!canvasElement) {
+            console.warn("Canvas element not found.");
+            return;
+        }
 
-          const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-          canvas.width = img.width * scale;
-          canvas.height = img.height * scale;
+        const ctx = canvasElement.getContext('2d');
 
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(blob => {
-            const reader2 = new FileReader();
-            reader2.onloadend = () => resolve(reader2.result.split(',')[1]); // base64 only
-            reader2.readAsDataURL(blob);
-          }, 'image/png');
-        };
-        img.onerror = reject;
-        img.src = event.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
+        if (!ctx) {
+            console.error("Canvas context not available.");
+            return;
+        }
 
+        const id = canvasElement.id || Math.random().toString(36).substring(2);
+        canvasElement.id = id;
+
+        if (window.myCharts[id]) {
+            window.myCharts[id].destroy();
+        }
+
+        window.myCharts[id] = new Chart(ctx, config);
+    };
