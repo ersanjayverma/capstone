@@ -1,101 +1,132 @@
-﻿@page "/dashboard"  
-@inject HttpClient Http  
-@using ApexCharts  
-@using ApexColor = ApexCharts.Color  
-@using MudColor = MudBlazor.Color  
-<AuthorizeView>  
-    <Authorized>  
-        <PageTitle>ZTACS Dashboard</PageTitle>  
-  
-        <MudText Typo="Typo.h4" Class="mb-4">ZTACS Threat Summary</MudText>  
-  
-        <MudGrid>  
-            <MudItem xs="12" sm="3">  
-                <MudCard Class="pa-4" Style="background-color:#ffffff;">  
-                    <MudText Typo="Typo.subtitle1" Style="color:#000000;">Total Logs</MudText>  
-                    <MudText Typo="Typo.h5" Style="color:#000000;">@Stats?.Total</MudText>  
-                </MudCard>  
-            </MudItem>  
-  
-            <MudItem xs="12" sm="3">  
-                <MudCard Class="pa-4" Style="background-color:#ffe6e6;">  
-                    <MudText Typo="Typo.subtitle1" Style="color:#b00020;">Blocked</MudText>  
-                    <MudText Typo="Typo.h5" Style="color:#b00020;">@Stats?.Blocked</MudText>  
-                </MudCard>  
-            </MudItem>  
-  
-            <MudItem xs="12" sm="3">  
-                <MudCard Class="pa-4" Style="background-color:#fff6e6;">  
-                    <MudText Typo="Typo.subtitle1" Style="color:#b36b00;">Suspicious</MudText>  
-                    <MudText Typo="Typo.h5" Style="color:#b36b00;">@Stats?.Suspicious</MudText>  
-                </MudCard>  
-            </MudItem>  
-  
-            <MudItem xs="12" sm="3">  
-                <MudCard Class="pa-4" Style="background-color:#e6fff2;">  
-                    <MudText Typo="Typo.subtitle1" Style="color:#007d5e;">Clean</MudText>  
-                    <MudText Typo="Typo.h5" Style="color:#007d5e;">@Stats?.Clean</MudText>  
-                </MudCard>  
-            </MudItem>  
-        </MudGrid>  
-  
-        <MudDivider Class="my-1"/>  
-  
-        @if (ChartData.Any())  
-        {  
-            <MudText Typo="Typo.h6" Class="mt-4 mb-2">Threat Status Distribution</MudText>  
-            <div class="content-scrollable">  
-                @*  style="width: 100%; height: 30%; overflow: hidden;" *@  
-                <ApexChart TItem="ChartPoint"  
-                           Title="Threats"  
-                           Height="350">  
-                    <ApexPointSeries TItem="@ChartPoint"  
-                                     Items="@ChartData"  
-                                     Name="Threat Level"  
-                                     XValue="@(p => p.Label)"  
-                                     YAggregate="@(points => points.Sum(p => p.Value))"  
-                                     OrderByDescending="p => p.Y"  
-                                     SeriesType="SeriesType.Pie"/>  
-                </ApexChart>  
-            </div>  
-        }  
-  
-        <MudButton StartIcon="@Icons.Material.Filled.Refresh"  
-                   OnClick="LoadStats"  
-                   Variant="Variant.Filled"  
-                   Class="mt-4">  
-            Refresh  
-        </MudButton>  
-    </Authorized>  
-  
-    <NotAuthorized>  
-        <MudPaper Class="pa-6 mx-auto mt-10" MaxWidth="500px" Style="background-color:#1e1e2f; color: #f5f5f5;">  
-            <MudText Typo="Typo.h6">🚫 You are not authorized</MudText>  
-            <MudButton Href="/login" Variant="Variant.Filled" Color="MudColor.Primary" Class="mt-4">Login</MudButton>  
-        </MudPaper>  
-    </NotAuthorized>  
-</AuthorizeView>  
-  
-@code {  
-    private LogStatistics? Stats;  
-    private List<ChartPoint> ChartData = new();  
-  
-    protected override async Task OnInitializedAsync() => await LoadStats();  
-  
-    private async Task LoadStats()  
-    {  
-        Stats = await Http.GetFromJsonAsync<LogStatistics>("api/ThreatDetection/logs/stats");  
-  
-        if (Stats is not null)  
-        {  
-            ChartData = new List<ChartPoint>  
-            {  
-                new() { Label = "Blocked", Value = Stats.Blocked, Color = "#FF4C4C" },  
-                new() { Label = "Suspicious", Value = Stats.Suspicious, Color = "4CAF50" },  
-                new() { Label = "Clean", Value = Stats.Clean, Color = "#FFD700" }  
-            };  
-        }  
-  
-        await InvokeAsync(StateHasChanged);  
-    }  
+﻿@page "/dashboard"
+@inject HttpClient Http
+@using ApexCharts
+@using ApexColor = ApexCharts.Color
+@using MudColor = MudBlazor.Color
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
+
+<AuthorizeView>
+    <Authorized>
+        <PageTitle>ZTACS Dashboard</PageTitle>
+
+        <MudText Typo="Typo.h4" Class="mb-4">ZTACS Threat Summary</MudText>
+
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#ffffff;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#000000;">Total Logs</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#000000;">@Stats?.Total</MudText>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#ffe6e6;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#b00020;">Blocked</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#b00020;">@Stats?.Logs.Count(e => e.Status == "blocked")</MudText>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#fff6e6;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#b36b00;">Suspicious</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#b36b00;">@Stats?.Logs.Count(e => e.Status == "suspicious")</MudText>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="3">
+                <MudCard Class="pa-4" Style="background-color:#e6fff2;">
+                    <MudText Typo="Typo.subtitle1" Style="color:#007d5e;">Clean</MudText>
+                    <MudText Typo="Typo.h5" Style="color:#007d5e;">@Stats?.Logs.Count(e => e.Status == "clean")</MudText>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-1" />
+
+        @if (ChartData.Any())
+        {
+            <MudPaper Elevation="3" Class="p-4 rounded-lg">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">📊 Threat Level Chart</MudText>
+
+            
+
+                    <div class="content-scrollable" style="max-height: 500px; overflow-y: auto;">
+                        <ApexChart TItem="ChartPoint"
+                                   Title="Threats Over Time"
+                                   Height="350"
+                                   >
+                            <ApexPointSeries TItem="ChartPoint"
+                                             Items="@ChartData"
+                                             Name="Threat Level"
+                                             SeriesType="@SeriesTypes[@selectedType]"
+                                             XValue="@( (ChartPoint p) => p.Timestamp )"
+                                             YValue="@( (ChartPoint p) => p.Value )"
+                                      />
+                        </ApexChart>
+                    </div>
+                </MudStack>
+            </MudPaper>
+        }
+
+        <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="LoadStats"
+                   Variant="Variant.Filled"
+                   Class="mt-4">
+            Refresh
+        </MudButton>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudPaper Class="pa-6 mx-auto mt-10" MaxWidth="500px" Style="background-color:#1e1e2f; color: #f5f5f5;">
+            <MudText Typo="Typo.h6">🚫 You are not authorized</MudText>
+            <MudButton Href="/login" Variant="Variant.Filled" Color="MudColor.Primary" Class="mt-4">Login</MudButton>
+        </MudPaper>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private LogResponse? Stats;
+    private List<ChartPoint> ChartData = new();
+    private int selectedType = 1;
+
+    private Dictionary<int, SeriesType> SeriesTypes = new()
+    {
+        { 0, SeriesType.Line },
+        { 1, SeriesType.Area },
+        { 2, SeriesType.Bar },
+        { 3, SeriesType.Scatter },
+        { 4, SeriesType.Heatmap },
+        { 5, SeriesType.Radar },
+    };
+
+    protected override async Task OnInitializedAsync() => await LoadStats();
+
+    private async Task LoadStats()
+    {
+        Stats = await Http.GetFromJsonAsync<LogResponse>("api/ThreatDetection/logs?ip=&status=&page=0&pageSize=100000");
+
+        if (Stats is not null)
+        {
+            ChartData = Stats.Logs.Select(e => new ChartPoint
+            {
+                Label = e.Status,
+                Value = e.Score ?? 0,
+                Timestamp = e.Timestamp,
+                Color = e.Status switch
+                {
+                    "blocked" => "#FF4C4C",
+                    "suspicious" => "#4CAF50",
+                    "clean" => "#FFD700",
+                    _ => "#B0BEC5"
+                }
+            }).ToList();
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    private void Update(){
+        InvokeAsync(StateHasChanged);
+    }
 }

@@ -113,6 +113,7 @@ namespace ZTACS.Server.Services
             var details = GetLogDetailAsync(logEvent.Id).GetAwaiter().GetResult();
             if (details is not null)
             {
+                details.LoginEventId = logEvent.Id;
                 _db.LogEventDetails.Add(details);
                 _db.SaveChanges();
             }
