@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ZTACS.Shared.Entities
 {
-    public class LoginEvent : Base
+    public class LogEvent : Base
     {
         public string UserId { get; set; } = null!;
         private string _ip = string.Empty;

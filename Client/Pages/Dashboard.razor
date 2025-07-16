@@ -40,7 +40,7 @@
             </MudItem>
         </MudGrid>
 
-        <MudDivider Class="my-4" />
+        <MudDivider Class="my-4"/>
 
         @if (ChartData.Any())
         {
@@ -56,8 +56,8 @@
                     </MudSelect>
 
                     <div style="width:100%; height:400px; position: relative;">
-    <canvas @ref="CanvasRef" id="threatChart" width="1080" height="400"></canvas>
-</div>
+                        <canvas @ref="CanvasRef" id="threatChart" width="1080" height="400"></canvas>
+                    </div>
 
                 </MudStack>
             </MudPaper>
@@ -196,4 +196,5 @@
         _chartRendered = false;
         await InvokeAsync(StateHasChanged);
     }
+
 }

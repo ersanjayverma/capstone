@@ -19,7 +19,7 @@ namespace ZTACS.Server.Services
 
         Task<LogEventDetail?> GetLogDetailAsync(Guid id);
 
-        Task<List<LoginEvent>> GetAllLogs();
+        Task<List<LogEvent>> GetAllLogs();
 
         Task EnrichProfileFromThreatRequestAsync(HttpContext httpContext, UserProfile profile,
             ThreatDetectionRequest request);

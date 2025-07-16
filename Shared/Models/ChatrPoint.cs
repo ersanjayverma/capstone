@@ -5,7 +5,9 @@ namespace ZTACS.Shared.Models
         public string Label { get; set; } = string.Empty;
         public double Value { get; set; }
         public string? Color { get; set; } // Optional: for customized coloring per point
+
         public DateTime Timestamp { get; set; }
+
         // Optional: for tooltips or extended info
         public string? Tooltip { get; set; }
 
@@ -17,10 +19,10 @@ namespace ZTACS.Shared.Models
         {
         }
 
-        public ChartPoint(string label, double value, DateTime TimeStamp,string? color = null, string? tooltip = null,
+        public ChartPoint(string label, double value, DateTime TimeStamp, string? color = null, string? tooltip = null,
             string? category = null)
         {
-            Timestamp= TimeStamp;
+            Timestamp = TimeStamp;
             Label = label;
             Value = value;
             Color = color;

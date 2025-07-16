@@ -9,7 +9,7 @@ namespace ZTACS.Shared.Models
 {
     public class LogsResponse
     {
-        public List<LoginEvent> Logs { get; set; }
+        public List<LogEvent> Logs { get; set; }
         public int Total { get; set; }
     }
 }

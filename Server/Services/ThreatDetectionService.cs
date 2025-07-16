@@ -55,7 +55,7 @@ namespace ZTACS.Server.Services
                 reasons.Add("Unusual access hour");
             }
 
-            var lastLogins = _db.LoginEvents
+            var lastLogins = _db.LogEvents
                 .Where(e => e.UserId == request.UserId)
                 .OrderByDescending(e => e.Timestamp)
                 .Take(20)
@@ -80,7 +80,7 @@ namespace ZTACS.Server.Services
                     reasons.Add("New device used");
                 }
 
-                if (lastLogins.Count(e => e.Timestamp > request.Timestamp.AddMinutes(-5)) > 5)
+                if (lastLogins.Count(e => e.Timestamp > request.Timestamp.AddMinutes(-1)) > 15)
                 {
                     riskScore += 25;
                     reasons.Add("High-frequency login attempts");
@@ -94,7 +94,7 @@ namespace ZTACS.Server.Services
                 _ => "clean"
             };
 
-            var logEvent = new LoginEvent
+            var logEvent = new LogEvent
             {
                 Id = Guid.NewGuid(),
                 UserId = request.UserId,
@@ -106,9 +106,9 @@ namespace ZTACS.Server.Services
                 Status = finalStatus,
                 Reason = string.Join("; ", reasons)
             };
-            
 
-            _db.LoginEvents.Add(logEvent);
+
+            _db.LogEvents.Add(logEvent);
             _db.SaveChanges();
             var details = GetLogDetailAsync(logEvent.Id).GetAwaiter().GetResult();
             if (details is not null)
@@ -185,7 +185,7 @@ namespace ZTACS.Server.Services
         public async Task<LogResponse> GetLogs(HttpContext httpContext, string? ip = null, string? status = null,
             int page = 1, int pageSize = 50)
         {
-            var query = _db.LoginEvents.AsQueryable();
+            var query = _db.LogEvents.AsQueryable();
             var user = httpContext.User;
 
             if (!user.Identity?.IsAuthenticated ?? true)
@@ -231,7 +231,7 @@ namespace ZTACS.Server.Services
 
         public async Task<LogEventDetail?> GetLogDetailAsync(Guid id)
         {
-            var log = await _db.LoginEvents.FindAsync(id);
+            var log = await _db.LogEvents.FindAsync(id);
             if (log == null) return null;
 
             var whois = await EnrichIpAsync(log.Ip);
@@ -257,9 +257,9 @@ namespace ZTACS.Server.Services
             };
         }
 
-        public async Task<List<LoginEvent>> GetAllLogs()
+        public async Task<List<LogEvent>> GetAllLogs()
         {
-            return await _db.LoginEvents
+            return await _db.LogEvents
                 .OrderByDescending(e => e.Timestamp)
                 .ToListAsync();
         }
@@ -270,7 +270,8 @@ namespace ZTACS.Server.Services
             var csv = new StringBuilder();
 
             // Header
-            csv.AppendLine("LoginEventId,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp,Country,City,Region,ISP,ASN,UserAgent,IsWhitelisted,IsBlocked");
+            csv.AppendLine(
+                "LoginEventId,UserId,IP,Device,Endpoint,Score,Status,Reason,Timestamp,Country,City,Region,ISP,ASN,UserAgent,IsWhitelisted,IsBlocked");
 
             foreach (var log in logs)
             {
@@ -283,7 +284,7 @@ namespace ZTACS.Server.Services
                     log.Score?.ToString() ?? "",
                     Escape(log.Status),
                     Escape(log.Reason),
-                    Escape(((long)(log.Timestamp.ToUnixTimeMilliseconds()/1000)).ToString()),
+                    Escape(((long)(log.Timestamp.ToUnixTimeMilliseconds() / 1000)).ToString()),
                     Escape(log.Country),
                     Escape(log.City),
                     Escape(log.Region),
@@ -365,9 +366,9 @@ namespace ZTACS.Server.Services
 
         public async Task<LogStatistics> GetLogStatisticsAsync()
         {
-            var total = await _db.LoginEvents.CountAsync();
-            var blocked = await _db.LoginEvents.CountAsync(e => e.Status == "blocked");
-            var suspicious = await _db.LoginEvents.CountAsync(e => e.Status == "suspicious");
+            var total = await _db.LogEvents.CountAsync();
+            var blocked = await _db.LogEvents.CountAsync(e => e.Status == "blocked");
+            var suspicious = await _db.LogEvents.CountAsync(e => e.Status == "suspicious");
             var clean = total - blocked - suspicious;
 
             return new LogStatistics

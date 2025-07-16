@@ -27,7 +27,7 @@
                 Apply Filters
             </MudButton>
 
-            <MudTable T="LoginEvent"
+            <MudTable T="LogEvent"
                       @ref="table"
                       ServerData="LoadServerData"
                       RowsPerPage="@pageSize"
@@ -95,7 +95,7 @@
 @code {
     private string? ipFilter;
     private string? statusFilter;
-    private MudTable<LoginEvent>? table;
+    private MudTable<LogEvent>? table;
     private bool loading = false;
     private int currentPage = 1;
     private int pageSize = 10;
@@ -111,13 +111,13 @@
         statusFilter = query["status"];
     }
 
-    private async Task<TableData<LoginEvent>> LoadServerData(TableState state, CancellationToken c = new())
+    private async Task<TableData<LogEvent>> LoadServerData(TableState state, CancellationToken c = new())
     {
         var url = $"api/ThreatDetection/logs?ip={ipFilter}&status={statusFilter}&page={currentPage}&pageSize={5}";
         var response = await Http.GetFromJsonAsync<LogResponse>(url);
 
         totalItems = response.Total; // Ideally you'd get total count separately from API
-        return new TableData<LoginEvent> { Items = response.Logs, TotalItems = totalItems };
+        return new TableData<LogEvent> { Items = response.Logs, TotalItems = totalItems };
     }
 
     private async Task PreviousPage()
@@ -158,7 +158,7 @@
     }
 
 
-    private async Task ShowDetails(LoginEvent row)
+    private async Task ShowDetails(LogEvent row)
     {
         var url = $"api/ThreatDetection/logs/{row.Id}";
         var response = await Http.GetFromJsonAsync<LogEventDetail>(url);

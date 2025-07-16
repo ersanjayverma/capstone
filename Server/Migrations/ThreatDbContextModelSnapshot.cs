@@ -49,6 +49,59 @@ namespace ZTACS.Server.Migrations
                     b.ToTable("BlacklistedIps");
                 });
 
+            modelBuilder.Entity("ZTACS.Shared.Entities.LogEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Device")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LogEvents");
+                });
+
             modelBuilder.Entity("ZTACS.Shared.Entities.LogEventDetail", b =>
                 {
                     b.Property<Guid>("Id")
@@ -138,59 +191,6 @@ namespace ZTACS.Server.Migrations
                     b.HasIndex("LoginEventId");
 
                     b.ToTable("LogEventDetails");
-                });
-
-            modelBuilder.Entity("ZTACS.Shared.Entities.LoginEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Device")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Ip")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int?>("Score")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LoginEvents");
                 });
 
             modelBuilder.Entity("ZTACS.Shared.Entities.UserProfile", b =>
@@ -317,7 +317,7 @@ namespace ZTACS.Server.Migrations
 
             modelBuilder.Entity("ZTACS.Shared.Entities.LogEventDetail", b =>
                 {
-                    b.HasOne("ZTACS.Shared.Entities.LoginEvent", "LoginEvent")
+                    b.HasOne("ZTACS.Shared.Entities.LogEvent", "LoginEvent")
                         .WithMany()
                         .HasForeignKey("LoginEventId")
                         .OnDelete(DeleteBehavior.Cascade)
