@@ -36,7 +36,12 @@ namespace ZTACS.API.Controllers
             var logs = await threatDetectionService.GetLogs(HttpContext, ip, status, page, pageSize);
             return Ok(logs);
         }
-
+        [HttpGet("logs/all")]
+        public async Task<IActionResult> GetLogs()
+        {
+            var logs = await threatDetectionService.GetAllLogs(HttpContext);
+            return Ok(logs);
+        }
         [HttpGet("logs/{id}")]
         public async Task<IActionResult> GetLogById(Guid id)
         {
@@ -50,7 +55,7 @@ namespace ZTACS.API.Controllers
         [HttpGet("logs/export")]
         public async Task<IActionResult> ExportLogs()
         {
-            var csv = await threatDetectionService.ExportLogsToCsv();
+            var csv = await threatDetectionService.ExportLogsToCsv(HttpContext);
             var bytes = Encoding.UTF8.GetBytes(csv);
             return File(bytes, "text/csv", "threat_logs.csv");
         }

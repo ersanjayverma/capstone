@@ -19,13 +19,13 @@ namespace ZTACS.API.Services
 
         Task<LogEventDetail?> GetLogDetailAsync(Guid id);
 
-        Task<List<LogEvent>> GetAllLogs();
+        Task<List<LogEvent>> GetAllLogs(HttpContext ctx);
 
         Task EnrichProfileFromThreatRequestAsync(HttpContext httpContext, UserProfile profile,
             ThreatDetectionRequest request);
 
 
-        Task<string> ExportLogsToCsv();
+        Task<string> ExportLogsToCsv(HttpContext ctx);
 
         Task BlockIp(BlockIpRequest request);
 

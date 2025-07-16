@@ -1,12 +1,13 @@
-﻿using System.Net.Http;
-using System.Security.Claims;
-using System.Text.Json;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using ZTACS.Server.Data;
+using System;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using ZTACS.API.Data;
 using ZTACS.Shared.Entities;
 using ZTACS.Shared.Models;
-using System.Text;
-using ApexCharts;
 
 namespace ZTACS.API.Services
 {
@@ -192,7 +193,7 @@ namespace ZTACS.API.Services
                 return new LogResponse();
 
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+            
             if (!string.IsNullOrWhiteSpace(ip))
                 query = query.Where(e => e.Ip.Contains(ip));
 
@@ -216,7 +217,7 @@ namespace ZTACS.API.Services
 
             if (page < 1) page = 1;
 
-            var logs = await query
+            var logs = await query.Where(x => x.UserId ==userId)
                 .OrderByDescending(e => e.Timestamp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -257,16 +258,16 @@ namespace ZTACS.API.Services
             };
         }
 
-        public async Task<List<LogEvent>> GetAllLogs()
+        public async Task<List<LogEvent>> GetAllLogs(HttpContext ctx)
         {
-            return await _db.LogEvents
-                .OrderByDescending(e => e.Timestamp)
-                .ToListAsync();
+            var user = ctx.User;
+            return await _db.LogEvents.Where(x => x.UserId == user.FindFirst(ClaimTypes.NameIdentifier).Value).ToListAsync();
         }
 
-        public async Task<string> ExportLogsToCsv()
+        public async Task<string> ExportLogsToCsv(HttpContext ctx)
         {
-            var logs = await _db.LogEventDetails.ToListAsync();
+            var user = ctx.User;
+            var logs = await _db.LogEventDetails.Where(x=>x.UserId == user.FindFirst(ClaimTypes.NameIdentifier).Value).ToListAsync();
             var csv = new StringBuilder();
 
             // Header
@@ -284,7 +285,7 @@ namespace ZTACS.API.Services
                     log.Score?.ToString() ?? "",
                     Escape(log.Status),
                     Escape(log.Reason),
-                    Escape(((long)(log.Timestamp.ToUnixTimeMilliseconds() / 1000)).ToString()),
+                    Escape(((long)(new DateTimeOffset(log.Timestamp).ToUnixTimeMilliseconds()/1000)).ToString()),
                     Escape(log.Country),
                     Escape(log.City),
                     Escape(log.Region),
