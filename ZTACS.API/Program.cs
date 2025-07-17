@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ZTACS.API.Data;
 using ZTACS.API.MIddleWare;
 using ZTACS.API.Services;
+using Microsoft.OpenApi.Models;
 
 namespace ZTACS.API
 {
@@ -43,16 +44,51 @@ namespace ZTACS.API
             // 🔧 Add services
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ZTACS API", Version = "v1" });
+
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter a valid JWT token",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+
+    c.AddSecurityDefinition("Bearer", securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, new[] { "Bearer" } }
+    });
+});
             builder.Services.AddHttpClient();
 
             var app = builder.Build();
-
+app.UsePathBase("/api/v1");
             // 🔧 Dev tools
+            app.Use((context, next) =>
+{
+    context.Request.PathBase = "/api/v1";
+    return next();
+});
+
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/api/v1/swagger/v1/swagger.json", "ZTACS API V1");
+                    c.RoutePrefix = "swagger"; // So it's accessible via /api/v1/swagger/index.html
+                });
             }
 
             app.UseHttpsRedirection();

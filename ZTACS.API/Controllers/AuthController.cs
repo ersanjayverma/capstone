@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ZTACS.Shared.Models;
-
+[AllowAnonymus]
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
