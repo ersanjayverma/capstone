@@ -162,7 +162,7 @@ If you ever plan to **sell ZTACS to others**, not just use internally:
 
 ---
 
-## ✅ Your Current Stack Scales Well
+## ✅  Current Stack Scales Well
 
 | Stack Component     | Scalability | Prod Viability       |
 | ------------------- | ----------- | -------------------- |
