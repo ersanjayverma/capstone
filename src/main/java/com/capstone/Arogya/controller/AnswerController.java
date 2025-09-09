@@ -22,11 +22,6 @@ public class AnswerController {
         return ResponseEntity.ok(saved);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<AnswerDto>> getAnswersForUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(questionService.getAnswersForUser(userId));
-    }
-
     @GetMapping("/question/{questionId}")
     public ResponseEntity<List<AnswerDto>> getAnswersForQuestion(@PathVariable Long questionId) {
         return ResponseEntity.ok(questionService.getAnswersForQuestion(questionId));
