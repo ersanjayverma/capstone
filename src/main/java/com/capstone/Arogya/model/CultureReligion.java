@@ -29,9 +29,5 @@ public class CultureReligion {
     @ManyToMany(mappedBy = "cultureAndReligion", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
-    private String religion;
 
-    private String culturalBelief;
-
-    private Boolean isReligious;
 }

@@ -28,7 +28,4 @@ public class SocialPolitical {
     @ManyToMany(mappedBy = "socialAndPolitical", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
-    private String politicalBelief;
-
-    private String politicalMotto;
 }

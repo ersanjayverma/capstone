@@ -28,10 +28,5 @@ public class HealthWellness {
     @ManyToMany(mappedBy = "healthAndWellness", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
-    private Set<String> medicalConditions = new HashSet<>();
-
-    private int height;
-
-    private int weight;
 
 }
