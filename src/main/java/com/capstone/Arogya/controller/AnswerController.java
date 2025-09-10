@@ -21,9 +21,4 @@ public class AnswerController {
         AnswerDto saved = questionService.submitAnswer(dto);
         return ResponseEntity.ok(saved);
     }
-
-    @GetMapping("/question/{questionId}")
-    public ResponseEntity<List<AnswerDto>> getAnswersForQuestion(@PathVariable Long questionId) {
-        return ResponseEntity.ok(questionService.getAnswersForQuestion(questionId));
-    }
 }

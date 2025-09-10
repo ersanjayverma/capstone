@@ -39,32 +39,6 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "user_culture_religion",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "culture_religion_id")
-    )
-    private Set<CultureReligion> cultureAndReligion = new HashSet<>();
-
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "user_social_political",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "social_political_id")
-    )
-    private Set<SocialPolitical> socialAndPolitical = new HashSet<>();
-
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "user_health_wellness",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "health_wellness_id")
-    )
-    private Set<HealthWellness> healthAndWellness = new HashSet<>();
-
     @OneToMany(mappedBy = "user", 
         cascade = CascadeType.ALL,
         orphanRemoval = true, 

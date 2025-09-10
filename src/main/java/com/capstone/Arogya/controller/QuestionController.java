@@ -10,22 +10,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/answers")
+@RequestMapping("/api/questions")
 @RequiredArgsConstructor
 public class QuestionController {
 
     private final QuestionService questionService;
 
-    // Submit an answer
-    @PostMapping
-    public ResponseEntity<AnswerDto> submitAnswer(@RequestBody SubmitAnswerDto dto) {
-        AnswerDto saved = questionService.submitAnswer(dto);
-        return ResponseEntity.ok(saved);
-    }
 
     // Fetch all answers for a specific user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<AnswerDto>> getAnswersForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(questionService.getAnswersForUser(userId));
+    }
+
+    // Fetch all answers for a specific question
+    @GetMapping("/question/{questionId}")
+    public ResponseEntity<List<AnswerDto>> getAnswersForQuestion(@PathVariable Long questionId) {
+        return ResponseEntity.ok(questionService.getAnswersForQuestion(questionId));
     }
 }

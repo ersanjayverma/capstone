@@ -19,9 +19,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest req) {
         AuthResponse res = authService.login(req);
         return ResponseEntity.ok(res);
     }
 }
+                                                                
