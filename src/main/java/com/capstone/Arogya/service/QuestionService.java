@@ -60,7 +60,9 @@ public class QuestionService {
         return toDto(saved);
     }
 
-
+    public List<AnswerDto> getAnswersForUser(Long userId) {
+            return answerRepository.findByUserId(userId).stream().map(this::toDto).collect(Collectors.toList());
+    }
     private AnswerDto toDto(Answer a) {
         return AnswerDto.builder()
                 .id(a.getId())
