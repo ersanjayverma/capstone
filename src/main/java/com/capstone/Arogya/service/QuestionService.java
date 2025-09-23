@@ -1,13 +1,11 @@
 package com.capstone.Arogya.service;
 
-import com.capstone.Arogya.dto.AnswerDto;
-import com.capstone.Arogya.dto.SubmitAnswerDto;
+import com.capstone.Arogya.dto.*;
 import com.capstone.Arogya.model.*;
 import com.capstone.Arogya.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,9 +17,9 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionOptionRepository optionRepository;
     private final AnswerRepository answerRepository;
-
+ 
     @Transactional
-    public AnswerDto submitAnswer(SubmitAnswerDto dto) {
+    public AnswerDto submitAnswer(SubmitAnswerDto dto,Long userId) {
         Question q = questionRepository.findById(dto.getQuestionId())
                 .orElseThrow(() -> new IllegalArgumentException("Question not found: " + dto.getQuestionId()));
 
@@ -40,7 +38,7 @@ public class QuestionService {
         // For now: always insert new row. To update, findByUserIdAndQuestionId and update if present.
 
         Answer a = Answer.builder()
-                .userId(dto.getUserId())
+                .userId(userId)
                 .question(q)
                 .answeredAt(Instant.now())
                 .build();
@@ -81,6 +79,40 @@ public class QuestionService {
                 .selectedOptionId(a.getSelectedOption() != null ? a.getSelectedOption().getId() : null)
                 .selectedOptionText(a.getSelectedOption() != null ? a.getSelectedOption().getText() : null)
                 .answeredAt(a.getAnsweredAt())
+                .build();
+    }
+
+   @Transactional(readOnly = true)
+    public QuestionDto getNextQuestionForUser(Long userId) {
+        // Fetch all questions
+        List<Question> allQuestions = questionRepository.findAll();
+
+        // IDs of questions already answered
+        List<Long> answeredQuestionIds = answerRepository.findByUserId(userId)
+                .stream()
+                .map(a -> a.getQuestion().getId())
+                .toList();
+
+        // First unanswered question
+        return allQuestions.stream()
+                .filter(q -> !answeredQuestionIds.contains(q.getId()))
+                .findFirst()
+                .map(this::toDto)
+                .orElse(null); // or throw exception if no more questions
+    }
+
+    private QuestionDto toDto(Question q) {
+        return QuestionDto.builder()
+                .id(q.getId())
+                .prompt(q.getPrompt())
+                .type(q.getType())
+                .required(q.isRequired())
+                .options(q.getOptions().stream()
+                        .map(opt -> QuestionOptionDto.builder()
+                                .id(opt.getId())
+                                .text(opt.getText())
+                                .build())
+                        .collect(Collectors.toSet()))
                 .build();
     }
 }

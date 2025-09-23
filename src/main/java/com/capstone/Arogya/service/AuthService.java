@@ -72,4 +72,10 @@ public class AuthService {
         String token = jwtUtil.generateToken(ud);
         return AuthResponse.builder().token(token).build();
     }
+    @Transactional(readOnly = true)
+        public Long getUserId(String username) {
+            return userRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + username))
+                    .getId();
+        }
 }
