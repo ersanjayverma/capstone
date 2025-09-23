@@ -17,32 +17,19 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final AuthService authService;
-
-    // Fetch all answers for a specific user
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<AnswerDto>> getAnswersForUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(questionService.getAnswersForUser(userId));
-    }
-
-    // Fetch all answers for a specific question
-    @GetMapping("/question/{questionId}")
-    public ResponseEntity<List<AnswerDto>> getAnswersForQuestion(@PathVariable Long questionId) {
-        return ResponseEntity.ok(questionService.getAnswersForQuestion(questionId));
-    }
-
     
-        @GetMapping("/next")
-        public ResponseEntity<QuestionDto> getNextQuestion(Authentication authentication) {
-            // Get username from the authenticated principal
-            String username = authentication.getName();
+    @GetMapping("/next")
+    public ResponseEntity<QuestionDto> getNextQuestion(Authentication authentication) {
+        // Get username from the authenticated principal
+        String username = authentication.getName();
 
-            // Fetch user ID from AuthService
-            Long userId = authService.getUserId(username);
+        // Fetch user ID from AuthService
+        Long userId = authService.getUserId(username);
 
-            // Fetch next question
-            QuestionDto nextQuestion = questionService.getNextQuestionForUser(userId);
+        // Fetch next question
+        QuestionDto nextQuestion = questionService.getNextQuestionForUser(userId);
 
-            return ResponseEntity.ok(nextQuestion);
-        }
+        return ResponseEntity.ok(nextQuestion);
+    }
 
 }
