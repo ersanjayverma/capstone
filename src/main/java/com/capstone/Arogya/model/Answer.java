@@ -8,8 +8,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "answers",
        indexes = {@Index(columnList = "user_id"), @Index(columnList = "question_id")})
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

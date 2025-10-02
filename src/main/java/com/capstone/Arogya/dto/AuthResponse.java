@@ -2,8 +2,7 @@ package com.capstone.Arogya.dto;
 
 import lombok.*;
 
-@Getter 
-@Setter 
+@Data
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder

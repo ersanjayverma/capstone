@@ -5,8 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "question_options")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
