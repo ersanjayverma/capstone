@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
     info = @Info(title = "Arogya API", version = "v1", description = "APIs for Arogya"),
     security = @SecurityRequirement(name = "bearerAuth"),
     servers = {
-        @Server(url = "https://capstone.blackhatbadshah.com", description = "Production (HTTPS)")
+        @Server(url = "https://ai.blackhatbadshah.com", description = "Production (HTTPS)")
     }
 )
 @SecurityScheme(
